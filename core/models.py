@@ -65,3 +65,11 @@ class IngestStats(BaseModel):
     skipped: int = 0
     deleted: int = 0
     failed: int = 0
+
+
+class ChunkResult(BaseModel):
+    id: int
+    content: str
+    source_path: str
+    chunk_index: int
+    score: float

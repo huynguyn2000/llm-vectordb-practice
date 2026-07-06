@@ -1,0 +1,13 @@
+Notes on physics and the solar system.
+
+The speed of light in a vacuum is approximately 299,792 kilometers per
+second, usually denoted as c in physics equations. Nothing that carries
+information can travel faster than c; it is the universal speed limit.
+
+Light from the Sun takes a little over eight minutes to reach Earth. The
+Sun itself is an ordinary main-sequence star containing about 99.8 percent
+of the solar system's total mass.
+
+The solar system has eight planets. The four inner planets are small and
+rocky, while the four outer planets are gas and ice giants. Beyond Neptune
+lies the Kuiper belt, home of dwarf planets such as Pluto.

@@ -1,40 +1,39 @@
 """
 Use case: RAG Chatbot
 ----------------------
-Retrieve relevant document chunks from the vector store and pass them
-as context to a local Ollama LLM to generate a grounded answer.
+Ingest the local corpus (chunked + embedded), retrieve the most relevant
+chunks from pgvector, and pass them as context to a local Ollama LLM to
+generate a grounded answer.
 """
 
 import os
+
 import ollama
 from dotenv import load_dotenv
 
 from core.db import VectorStore
 from core.embedder import Embedder
-from core.models import Document, DocumentResult
+from core.models import ChunkResult
+from ingestion.ingest import ingest_directory
 
 load_dotenv()
 
 LLM_MODEL = os.getenv("LLM_MODEL", "llama3.2")
+CORPUS_DIR = "data/corpus"
 
 
-def index_documents(docs: list[Document], store: VectorStore, embedder: Embedder) -> None:
-    store.clear_documents()
-    for doc in docs:
-        embedding = embedder.embed(doc.content)
-        store.insert_document(doc.content, doc.source, embedding)
-    print(f"Indexed {len(docs)} documents.")
-
-
-def retrieve(query: str, store: VectorStore, embedder: Embedder, top_k: int = 3) -> list[DocumentResult]:
+def retrieve(
+    query: str, store: VectorStore, embedder: Embedder, top_k: int = 3
+) -> list[ChunkResult]:
     embedding = embedder.embed(query)
-    rows = store.search_documents(embedding, top_k=top_k)
-    return [DocumentResult(**r) for r in rows]
+    rows = store.search_chunks(embedding, top_k=top_k)
+    return [ChunkResult(**r) for r in rows]
 
 
-def generate_answer(query: str, context_docs: list[DocumentResult]) -> str:
+def generate_answer(query: str, context_chunks: list[ChunkResult]) -> str:
     context = "\n\n".join(
-        f"[Source: {d.source}]\n{d.content}" for d in context_docs
+        f"[Source: {c.source_path}#chunk{c.chunk_index}]\n{c.content}"
+        for c in context_chunks
     )
     prompt = f"""You are a helpful assistant. Answer the question using ONLY the context below.
         If the answer is not in the context, say "I don't know based on the provided documents."
@@ -52,15 +51,17 @@ def generate_answer(query: str, context_docs: list[DocumentResult]) -> str:
 
 
 def chat(query: str, store: VectorStore, embedder: Embedder) -> str:
-    docs = retrieve(query, store, embedder)
-    return generate_answer(query, docs)
+    chunks = retrieve(query, store, embedder)
+    return generate_answer(query, chunks)
 
 
 def run(store: VectorStore, embedder: Embedder) -> None:
-    from data.documents import SAMPLE_DOCUMENTS
-
     print("\n=== RAG Chatbot ===")
-    index_documents(SAMPLE_DOCUMENTS, store, embedder)
+    stats = ingest_directory(CORPUS_DIR, store, embedder)
+    print(
+        f"Corpus ready: {stats.ingested} ingested, {stats.skipped} unchanged, "
+        f"{stats.deleted} deleted, {stats.failed} failed."
+    )
 
     questions = [
         "What is machine learning?",

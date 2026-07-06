@@ -148,3 +148,64 @@ class VectorStore:
         with self.conn.cursor() as cur:
             cur.execute("DELETE FROM logs")
         self.conn.commit()
+
+    # --- Sources & chunks (file ingestion pipeline) ---
+
+    def get_source_hashes(self) -> dict[str, str]:
+        """path -> content_hash for every ingested source."""
+        with self.conn.cursor() as cur:
+            cur.execute("SELECT path, content_hash FROM sources")
+            return {path: content_hash for path, content_hash in cur.fetchall()}
+
+    def upsert_source_with_chunks(
+        self,
+        path: str,
+        content_hash: str,
+        chunks: list[tuple[str, int, list[float]]],
+    ) -> None:
+        """Replace a source's chunks atomically: upsert the source row,
+        delete its old chunks, insert the new (content, token_count,
+        embedding) tuples - all in one transaction."""
+        with self.conn.cursor() as cur:
+            cur.execute(
+                """
+                INSERT INTO sources (path, content_hash)
+                VALUES (%s, %s)
+                ON CONFLICT (path)
+                DO UPDATE SET content_hash = EXCLUDED.content_hash, ingested_at = NOW()
+                RETURNING id
+                """,
+                (path, content_hash),
+            )
+            source_id = cur.fetchone()[0]
+            cur.execute("DELETE FROM chunks WHERE source_id = %s", (source_id,))
+            for idx, (content, token_count, embedding) in enumerate(chunks):
+                cur.execute(
+                    """
+                    INSERT INTO chunks (source_id, chunk_index, content, token_count, embedding)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """,
+                    (source_id, idx, content, token_count, embedding),
+                )
+        self.conn.commit()
+
+    def delete_source(self, path: str) -> None:
+        """Remove a source; its chunks go with it via ON DELETE CASCADE."""
+        with self.conn.cursor() as cur:
+            cur.execute("DELETE FROM sources WHERE path = %s", (path,))
+        self.conn.commit()
+
+    def search_chunks(self, embedding: list[float], top_k: int = 5) -> list[dict]:
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                """
+                SELECT c.id, c.content, c.chunk_index, s.path AS source_path,
+                       1 - (c.embedding <=> %s::vector) AS score
+                FROM chunks c
+                JOIN sources s ON s.id = c.source_id
+                ORDER BY c.embedding <=> %s::vector
+                LIMIT %s
+                """,
+                (embedding, embedding, top_k),
+            )
+            return [dict(r) for r in cur.fetchall()]

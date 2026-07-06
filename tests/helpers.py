@@ -1,6 +1,29 @@
 """Shared test utilities: a stdlib-only minimal PDF writer and a
 deterministic fake embedder (no Ollama needed)."""
 
+import hashlib
+import struct
+
+
+def fake_embedding(text: str, dim: int = 768) -> list[float]:
+    """Deterministic pseudo-embedding: same text -> same vector. Lets DB and
+    ingestion tests run without Ollama."""
+    digest = hashlib.sha256(text.encode()).digest()
+    data = digest * (dim * 4 // len(digest) + 1)
+    return [
+        struct.unpack_from("<I", data, i * 4)[0] % 1000 / 1000.0 for i in range(dim)
+    ]
+
+
+class FakeEmbedder:
+    """Drop-in for core.embedder.Embedder in tests."""
+
+    def embed(self, text: str) -> list[float]:
+        return fake_embedding(text)
+
+    def embed_many(self, texts: list[str]) -> list[list[float]]:
+        return [self.embed(t) for t in texts]
+
 
 def build_pdf(text: str) -> bytes:
     """Build a tiny one-page PDF containing `text` (Helvetica, no escaping —

@@ -28,3 +28,22 @@ CREATE TABLE IF NOT EXISTS logs (
 CREATE INDEX IF NOT EXISTS documents_embedding_idx ON documents USING hnsw (embedding vector_cosine_ops);
 CREATE INDEX IF NOT EXISTS products_embedding_idx ON products USING hnsw (embedding vector_cosine_ops);
 CREATE INDEX IF NOT EXISTS logs_embedding_idx ON logs USING hnsw (embedding vector_cosine_ops);
+
+CREATE TABLE IF NOT EXISTS sources (
+    id SERIAL PRIMARY KEY,
+    path TEXT UNIQUE NOT NULL,
+    content_hash TEXT NOT NULL,
+    ingested_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS chunks (
+    id SERIAL PRIMARY KEY,
+    source_id INT REFERENCES sources(id) ON DELETE CASCADE,
+    chunk_index INT NOT NULL,
+    content TEXT NOT NULL,
+    token_count INT NOT NULL,
+    embedding vector(768),
+    UNIQUE (source_id, chunk_index)
+);
+
+CREATE INDEX IF NOT EXISTS chunks_embedding_idx ON chunks USING hnsw (embedding vector_cosine_ops);

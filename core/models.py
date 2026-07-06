@@ -47,3 +47,9 @@ class LogResult(BaseModel):
     level: Optional[str]
     service: Optional[str]
     score: float
+
+
+class Chunk(BaseModel):
+    content: str
+    token_count: int
+    chunk_index: int

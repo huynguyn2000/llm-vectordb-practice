@@ -53,3 +53,8 @@ class Chunk(BaseModel):
     content: str
     token_count: int
     chunk_index: int
+
+
+class RawDocument(BaseModel):
+    path: str
+    text: str

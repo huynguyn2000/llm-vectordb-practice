@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Interactive RAG REPL — ask questions against the local corpus (data/corpus).
-Indexes documents once at startup; loops on stdin.
+Ingests the corpus once at startup (unchanged files are skipped); loops on stdin.
 
 Usage:
   python repl.py

@@ -10,13 +10,14 @@ def test_empty_and_whitespace_input_yield_no_chunks():
     assert chunk_text("   \n\n  ") == []
 
 
-def test_short_text_is_a_single_unmodified_chunk():
-    text = "Para one.\n\nPara two."
+def test_short_text_is_a_single_stripped_chunk():
+    # Chunk content is stripped of surrounding whitespace (e.g. a trailing newline).
+    text = "Para one.\n\nPara two.\n"
     chunks = chunk_text(text)
     assert len(chunks) == 1
-    assert chunks[0].content == text
+    assert chunks[0].content == text.strip()
     assert chunks[0].chunk_index == 0
-    assert chunks[0].token_count == count_tokens(text)
+    assert chunks[0].token_count == count_tokens(text.strip())
 
 
 def test_chunks_never_exceed_chunk_size():

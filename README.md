@@ -11,7 +11,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 | `python demo.py rag` | RAG chatbot (retrieve + generate) |
 | `python demo.py products` | Product / item similarity |
 | `python demo.py logs` | Log anomaly detection via clustering |
-| `python demo.py` | All four use cases |
+| `python demo.py` | All four demos (semantic, rag, products, logs) |
 
 ## Stack
 

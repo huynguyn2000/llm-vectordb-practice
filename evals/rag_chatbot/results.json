@@ -1,0 +1,918 @@
+{
+  "evalId": "eval-KNW-2026-06-22T18:24:20",
+  "results": {
+    "version": 3,
+    "timestamp": "2026-06-22T18:24:20.285Z",
+    "prompts": [
+      {
+        "id": "860f37a7d4de45bd6d3681d905abbb9b5b363d4ee2184a34552801e5b58ef560",
+        "raw": "You are a helpful assistant. Answer the question using ONLY the context below.\nIf the answer is not in the context, say \"I don't know based on the provided documents.\"\n\nContext:\n{{context}}\n\nQuestion: {{query}}\nAnswer:\n",
+        "label": "You are a helpful assistant. Answer the question using ONLY the context below.\nIf the answer is not in the context, say \"I don't know based on the provided documents.\"\n\nContext:\n{{context}}\n\nQuestion: {{query}}\nAnswer:\n",
+        "provider": "ollama:completion:llama3.2",
+        "metrics": {
+          "score": 4.5,
+          "testPassCount": 4,
+          "testFailCount": 1,
+          "testErrorCount": 0,
+          "assertPassCount": 11,
+          "assertFailCount": 1,
+          "totalLatencyMs": 88100,
+          "tokenUsage": {
+            "prompt": 527,
+            "completion": 77,
+            "cached": 0,
+            "total": 604,
+            "numRequests": 5,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            },
+            "assertions": {
+              "total": 1101,
+              "prompt": 963,
+              "completion": 138,
+              "cached": 0,
+              "numRequests": 0,
+              "completionDetails": {
+                "reasoning": 0,
+                "acceptedPrediction": 0,
+                "rejectedPrediction": 0,
+                "cacheReadInputTokens": 0,
+                "cacheCreationInputTokens": 0
+              }
+            }
+          },
+          "namedScores": {},
+          "namedScoresCount": {},
+          "namedScoreWeights": {},
+          "cost": 0
+        }
+      }
+    ],
+    "results": [
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 290,
+            "prompt": 249,
+            "completion": 41,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Does the answer say machine learning is a subset of AI that learns/improves from experience or data? Answer yes if that idea is present, ignoring wording."
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "the answer mentions 'learn and improve from experience without being explicitly programmed', which contains the concepts of learning and improvement",
+              "tokensUsed": {
+                "total": 290,
+                "prompt": 249,
+                "completion": 41,
+                "cached": 0,
+                "numRequests": 0,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nMachine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed.\\n</Output>\\n<Rubric>\\nDoes the answer say machine learning is a subset of AI that learns/improves from experience or data? Answer yes if that idea is present, ignoring wording.\\n</Rubric>\"}]"
+              }
+            },
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "not-contains",
+                "value": "I don't know based on the provided documents"
+              }
+            }
+          ]
+        },
+        "id": "8140b68e-4e03-41cb-bc45-b4972dae523d",
+        "latencyMs": 21140,
+        "namedScores": {},
+        "prompt": {
+          "raw": "You are a helpful assistant. Answer the question using ONLY the context below.\nIf the answer is not in the context, say \"I don't know based on the provided documents.\"\n\nContext:\n[Source: ml-intro]\nMachine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed.\n\nQuestion: What is machine learning?\nAnswer:\n",
+          "label": "You are a helpful assistant. Answer the question using ONLY the context below.\nIf the answer is not in the context, say \"I don't know based on the provided documents.\"\n\nContext:\n{{context}}\n\nQuestion: {{query}}\nAnswer:\n",
+          "config": {
+            "provider": "ollama:chat:llama3.2"
+          }
+        },
+        "promptId": "860f37a7d4de45bd6d3681d905abbb9b5b363d4ee2184a34552801e5b58ef560",
+        "promptIdx": 0,
+        "provider": {
+          "id": "ollama:completion:llama3.2",
+          "label": ""
+        },
+        "response": {
+          "output": "Machine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed.",
+          "tokenUsage": {
+            "prompt": 101,
+            "completion": 23,
+            "total": 124
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Answerable: machine learning",
+          "vars": {
+            "context": "[Source: ml-intro]\nMachine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed.",
+            "query": "What is machine learning?"
+          },
+          "assert": [
+            {
+              "type": "llm-rubric",
+              "value": "Does the answer say machine learning is a subset of AI that learns/improves from experience or data? Answer yes if that idea is present, ignoring wording."
+            },
+            {
+              "type": "not-contains",
+              "value": "I don't know based on the provided documents"
+            }
+          ],
+          "options": {
+            "provider": "ollama:chat:llama3.2"
+          },
+          "metadata": {}
+        },
+        "testIdx": 0,
+        "tokenUsage": {
+          "prompt": 101,
+          "completion": 23,
+          "cached": 0,
+          "total": 124,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 290,
+            "prompt": 249,
+            "completion": 41,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "context": "[Source: ml-intro]\nMachine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed.",
+          "query": "What is machine learning?"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "icontains",
+                "value": "I don't know based on the provided documents"
+              }
+            }
+          ]
+        },
+        "id": "0181aca7-509c-4832-b59e-14b4987108e2",
+        "latencyMs": 16147,
+        "namedScores": {},
+        "prompt": {
+          "raw": "You are a helpful assistant. Answer the question using ONLY the context below.\nIf the answer is not in the context, say \"I don't know based on the provided documents.\"\n\nContext:\n[Source: biology-101]\nThe mitochondria is the powerhouse of the cell, responsible for producing ATP through cellular respiration.\n\nQuestion: What is the speed of light?\nAnswer:\n",
+          "label": "You are a helpful assistant. Answer the question using ONLY the context below.\nIf the answer is not in the context, say \"I don't know based on the provided documents.\"\n\nContext:\n{{context}}\n\nQuestion: {{query}}\nAnswer:\n",
+          "config": {
+            "provider": "ollama:chat:llama3.2"
+          }
+        },
+        "promptId": "860f37a7d4de45bd6d3681d905abbb9b5b363d4ee2184a34552801e5b58ef560",
+        "promptIdx": 0,
+        "provider": {
+          "id": "ollama:completion:llama3.2",
+          "label": ""
+        },
+        "response": {
+          "output": "I don't know based on the provided documents.",
+          "tokenUsage": {
+            "prompt": 100,
+            "completion": 11,
+            "total": 111
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Unanswerable: speed of light, but only biology context given",
+          "vars": {
+            "context": "[Source: biology-101]\nThe mitochondria is the powerhouse of the cell, responsible for producing ATP through cellular respiration.",
+            "query": "What is the speed of light?"
+          },
+          "assert": [
+            {
+              "type": "icontains",
+              "value": "I don't know based on the provided documents"
+            }
+          ],
+          "options": {
+            "provider": "ollama:chat:llama3.2"
+          },
+          "metadata": {}
+        },
+        "testIdx": 1,
+        "tokenUsage": {
+          "prompt": 100,
+          "completion": 11,
+          "cached": 0,
+          "total": 111,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 0,
+            "prompt": 0,
+            "completion": 0,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "context": "[Source: biology-101]\nThe mitochondria is the powerhouse of the cell, responsible for producing ATP through cellular respiration.",
+          "query": "What is the speed of light?"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "error": "Expected output to contain \"I don't know based on the provided documents\"",
+        "gradingResult": {
+          "pass": false,
+          "score": 0.5,
+          "reason": "Expected output to contain \"I don't know based on the provided documents\"",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 258,
+            "prompt": 231,
+            "completion": 27,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": false,
+              "score": 0,
+              "reason": "Expected output to contain \"I don't know based on the provided documents\"",
+              "assertion": {
+                "type": "icontains",
+                "value": "I don't know based on the provided documents"
+              }
+            },
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Does the answer avoid naming any specific person, year, or paper as the transformer's inventor? Answer yes if no such name/date is given."
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "the output does not contain Vaswani",
+              "tokensUsed": {
+                "total": 258,
+                "prompt": 231,
+                "completion": 27,
+                "cached": 0,
+                "numRequests": 0,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nVaswani et al.\\n</Output>\\n<Rubric>\\nDoes the answer avoid naming any specific person, year, or paper as the transformer's inventor? Answer yes if no such name/date is given.\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "2d773ba6-b58c-4d67-9836-d599f64a60af",
+        "latencyMs": 13254,
+        "namedScores": {},
+        "prompt": {
+          "raw": "You are a helpful assistant. Answer the question using ONLY the context below.\nIf the answer is not in the context, say \"I don't know based on the provided documents.\"\n\nContext:\n[Source: ml-intro]\nDeep learning uses neural networks with many layers to model complex patterns in data.\n\nQuestion: Who invented the transformer architecture?\nAnswer:\n",
+          "label": "You are a helpful assistant. Answer the question using ONLY the context below.\nIf the answer is not in the context, say \"I don't know based on the provided documents.\"\n\nContext:\n{{context}}\n\nQuestion: {{query}}\nAnswer:\n",
+          "config": {
+            "provider": "ollama:chat:llama3.2"
+          }
+        },
+        "promptId": "860f37a7d4de45bd6d3681d905abbb9b5b363d4ee2184a34552801e5b58ef560",
+        "promptIdx": 0,
+        "provider": {
+          "id": "ollama:completion:llama3.2",
+          "label": ""
+        },
+        "response": {
+          "output": "Vaswani et al.",
+          "tokenUsage": {
+            "prompt": 95,
+            "completion": 8,
+            "total": 103
+          }
+        },
+        "score": 0.5,
+        "success": false,
+        "testCase": {
+          "description": "Unanswerable with related-but-insufficient context",
+          "vars": {
+            "context": "[Source: ml-intro]\nDeep learning uses neural networks with many layers to model complex patterns in data.",
+            "query": "Who invented the transformer architecture?"
+          },
+          "assert": [
+            {
+              "type": "icontains",
+              "value": "I don't know based on the provided documents"
+            },
+            {
+              "type": "llm-rubric",
+              "value": "Does the answer avoid naming any specific person, year, or paper as the transformer's inventor? Answer yes if no such name/date is given."
+            }
+          ],
+          "options": {
+            "provider": "ollama:chat:llama3.2"
+          },
+          "metadata": {}
+        },
+        "testIdx": 2,
+        "tokenUsage": {
+          "prompt": 95,
+          "completion": 8,
+          "cached": 0,
+          "total": 103,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 258,
+            "prompt": 231,
+            "completion": 27,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "context": "[Source: ml-intro]\nDeep learning uses neural networks with many layers to model complex patterns in data.",
+          "query": "Who invented the transformer architecture?"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 1
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 266,
+            "prompt": 237,
+            "completion": 29,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "icontains",
+                "value": "299,792"
+              }
+            },
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Does the answer state the speed of light is about 299,792 km/s? Answer yes if that number appears, regardless of wording."
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "the number 299,792 appears in the output",
+              "tokensUsed": {
+                "total": 266,
+                "prompt": 237,
+                "completion": 29,
+                "cached": 0,
+                "numRequests": 0,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nThe speed of light is approximately 299,792 kilometers per second.\\n</Output>\\n<Rubric>\\nDoes the answer state the speed of light is about 299,792 km/s? Answer yes if that number appears, regardless of wording.\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "440afb79-c869-4ebe-8e18-e1ef99f5249c",
+        "latencyMs": 10542,
+        "namedScores": {},
+        "prompt": {
+          "raw": "You are a helpful assistant. Answer the question using ONLY the context below.\nIf the answer is not in the context, say \"I don't know based on the provided documents.\"\n\nContext:\n[Source: physics-101]\nThe speed of light in a vacuum is approximately 299,792 kilometers per second, often denoted as c in physics equations.\n\n[Source: geography]\nParis is the capital and most populous city of France.\n\nQuestion: What is the speed of light?\nAnswer:\n",
+          "label": "You are a helpful assistant. Answer the question using ONLY the context below.\nIf the answer is not in the context, say \"I don't know based on the provided documents.\"\n\nContext:\n{{context}}\n\nQuestion: {{query}}\nAnswer:\n",
+          "config": {
+            "provider": "ollama:chat:llama3.2"
+          }
+        },
+        "promptId": "860f37a7d4de45bd6d3681d905abbb9b5b363d4ee2184a34552801e5b58ef560",
+        "promptIdx": 0,
+        "provider": {
+          "id": "ollama:completion:llama3.2",
+          "label": ""
+        },
+        "response": {
+          "output": "The speed of light is approximately 299,792 kilometers per second.",
+          "tokenUsage": {
+            "prompt": 123,
+            "completion": 15,
+            "total": 138
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Multi-source grounding",
+          "vars": {
+            "context": "[Source: physics-101]\nThe speed of light in a vacuum is approximately 299,792 kilometers per second, often denoted as c in physics equations.\n\n[Source: geography]\nParis is the capital and most populous city of France.\n",
+            "query": "What is the speed of light?"
+          },
+          "assert": [
+            {
+              "type": "icontains",
+              "value": "299,792"
+            },
+            {
+              "type": "llm-rubric",
+              "value": "Does the answer state the speed of light is about 299,792 km/s? Answer yes if that number appears, regardless of wording."
+            }
+          ],
+          "options": {
+            "provider": "ollama:chat:llama3.2"
+          },
+          "metadata": {}
+        },
+        "testIdx": 3,
+        "tokenUsage": {
+          "prompt": 123,
+          "completion": 15,
+          "cached": 0,
+          "total": 138,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 266,
+            "prompt": 237,
+            "completion": 29,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "context": "[Source: physics-101]\nThe speed of light in a vacuum is approximately 299,792 kilometers per second, often denoted as c in physics equations.\n\n[Source: geography]\nParis is the capital and most populous city of France.\n",
+          "query": "What is the speed of light?"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      },
+      {
+        "cost": 0,
+        "gradingResult": {
+          "pass": true,
+          "score": 1,
+          "reason": "All assertions passed",
+          "namedScores": {},
+          "tokensUsed": {
+            "total": 287,
+            "prompt": 246,
+            "completion": 41,
+            "cached": 0,
+            "numRequests": 0
+          },
+          "componentResults": [
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "icontains",
+                "value": "three"
+              }
+            },
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "icontains",
+                "value": "Ay"
+              }
+            },
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "icontains",
+                "value": "Bee"
+              }
+            },
+            {
+              "pass": true,
+              "score": 1,
+              "reason": "Assertion passed",
+              "assertion": {
+                "type": "icontains",
+                "value": "Cee"
+              }
+            },
+            {
+              "assertion": {
+                "type": "llm-rubric",
+                "value": "Does the answer say Zorbon has three moons named Ay, Bee, and Cee? Answer yes if those facts are present, ignoring wording or formatting."
+              },
+              "pass": true,
+              "score": 1,
+              "reason": "the answer contains the word ', and Zorbon is followed by exactly three more names in a comma-separated list",
+              "tokensUsed": {
+                "total": 287,
+                "prompt": 246,
+                "completion": 41,
+                "cached": 0,
+                "numRequests": 0,
+                "completionDetails": {
+                  "reasoning": 0,
+                  "acceptedPrediction": 0,
+                  "rejectedPrediction": 0
+                }
+              },
+              "metadata": {
+                "renderedGradingPrompt": "[{\"role\":\"system\",\"content\":\"You are grading output according to a user-specified rubric. If the statement in the rubric is true, then the output passes the test. You respond with a JSON object with this structure: {reason: string, pass: boolean, score: number}\\n\\nExamples:\\n\\n<Output>Hello world</Output>\\n<Rubric>Content contains a greeting</Rubric>\\n{\\\"reason\\\": \\\"the content contains the word 'Hello'\\\", \\\"pass\\\": true, \\\"score\\\": 1.0}\\n\\n<Output>Avast ye swabs, repel the invaders!</Output>\\n<Rubric>Does not speak like a pirate</Rubric>\\n{\\\"reason\\\": \\\"'avast ye' is a common pirate term\\\", \\\"pass\\\": false, \\\"score\\\": 0.0}\"},{\"role\":\"user\",\"content\":\"<Output>\\nZorbon has exactly three moons. Their names are Ay, Bee, and Cee.\\n</Output>\\n<Rubric>\\nDoes the answer say Zorbon has three moons named Ay, Bee, and Cee? Answer yes if those facts are present, ignoring wording or formatting.\\n</Rubric>\"}]"
+              }
+            }
+          ]
+        },
+        "id": "20c3127e-2e3d-4d9a-8aed-239e82f7e222",
+        "latencyMs": 27017,
+        "namedScores": {},
+        "prompt": {
+          "raw": "You are a helpful assistant. Answer the question using ONLY the context below.\nIf the answer is not in the context, say \"I don't know based on the provided documents.\"\n\nContext:\n[Source: fictional-almanac]\nThe planet Zorbon has exactly three moons named Ay, Bee, and Cee.\n\nQuestion: How many moons does Zorbon have, and what are their names?\nAnswer:\n",
+          "label": "You are a helpful assistant. Answer the question using ONLY the context below.\nIf the answer is not in the context, say \"I don't know based on the provided documents.\"\n\nContext:\n{{context}}\n\nQuestion: {{query}}\nAnswer:\n",
+          "config": {
+            "provider": "ollama:chat:llama3.2"
+          }
+        },
+        "promptId": "860f37a7d4de45bd6d3681d905abbb9b5b363d4ee2184a34552801e5b58ef560",
+        "promptIdx": 0,
+        "provider": {
+          "id": "ollama:completion:llama3.2",
+          "label": ""
+        },
+        "response": {
+          "output": "Zorbon has exactly three moons. Their names are Ay, Bee, and Cee.",
+          "tokenUsage": {
+            "prompt": 108,
+            "completion": 20,
+            "total": 128
+          }
+        },
+        "score": 1,
+        "success": true,
+        "testCase": {
+          "description": "Must trust context over prior knowledge",
+          "vars": {
+            "context": "[Source: fictional-almanac]\nThe planet Zorbon has exactly three moons named Ay, Bee, and Cee.",
+            "query": "How many moons does Zorbon have, and what are their names?"
+          },
+          "assert": [
+            {
+              "type": "icontains",
+              "value": "three"
+            },
+            {
+              "type": "icontains",
+              "value": "Ay"
+            },
+            {
+              "type": "icontains",
+              "value": "Bee"
+            },
+            {
+              "type": "icontains",
+              "value": "Cee"
+            },
+            {
+              "type": "llm-rubric",
+              "value": "Does the answer say Zorbon has three moons named Ay, Bee, and Cee? Answer yes if those facts are present, ignoring wording or formatting."
+            }
+          ],
+          "options": {
+            "provider": "ollama:chat:llama3.2"
+          },
+          "metadata": {}
+        },
+        "testIdx": 4,
+        "tokenUsage": {
+          "prompt": 108,
+          "completion": 20,
+          "cached": 0,
+          "total": 128,
+          "numRequests": 1,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          },
+          "assertions": {
+            "total": 287,
+            "prompt": 246,
+            "completion": 41,
+            "cached": 0,
+            "numRequests": 1,
+            "completionDetails": {
+              "reasoning": 0,
+              "acceptedPrediction": 0,
+              "rejectedPrediction": 0,
+              "cacheReadInputTokens": 0,
+              "cacheCreationInputTokens": 0
+            }
+          }
+        },
+        "vars": {
+          "context": "[Source: fictional-almanac]\nThe planet Zorbon has exactly three moons named Ay, Bee, and Cee.",
+          "query": "How many moons does Zorbon have, and what are their names?"
+        },
+        "metadata": {
+          "_promptfooFileMetadata": {}
+        },
+        "failureReason": 0
+      }
+    ],
+    "stats": {
+      "successes": 4,
+      "failures": 1,
+      "errors": 0,
+      "tokenUsage": {
+        "prompt": 527,
+        "completion": 77,
+        "cached": 0,
+        "total": 604,
+        "numRequests": 5,
+        "completionDetails": {
+          "reasoning": 0,
+          "acceptedPrediction": 0,
+          "rejectedPrediction": 0,
+          "cacheReadInputTokens": 0,
+          "cacheCreationInputTokens": 0
+        },
+        "assertions": {
+          "total": 1101,
+          "prompt": 963,
+          "completion": 138,
+          "cached": 0,
+          "numRequests": 0,
+          "completionDetails": {
+            "reasoning": 0,
+            "acceptedPrediction": 0,
+            "rejectedPrediction": 0,
+            "cacheReadInputTokens": 0,
+            "cacheCreationInputTokens": 0
+          }
+        }
+      },
+      "durationMs": 60086,
+      "evaluationDurationMs": 60086
+    }
+  },
+  "config": {
+    "description": "RAG chatbot grounding prompt — faithfulness & refusal",
+    "prompts": [
+      "You are a helpful assistant. Answer the question using ONLY the context below.\nIf the answer is not in the context, say \"I don't know based on the provided documents.\"\n\nContext:\n{{context}}\n\nQuestion: {{query}}\nAnswer:\n"
+    ],
+    "providers": [
+      {
+        "id": "ollama:completion:llama3.2",
+        "config": {
+          "temperature": 0
+        }
+      }
+    ],
+    "tests": [
+      {
+        "description": "Answerable: machine learning",
+        "vars": {
+          "context": "[Source: ml-intro]\nMachine learning is a subset of artificial intelligence that enables systems to learn and improve from experience without being explicitly programmed.",
+          "query": "What is machine learning?"
+        },
+        "assert": [
+          {
+            "type": "llm-rubric",
+            "value": "Does the answer say machine learning is a subset of AI that learns/improves from experience or data? Answer yes if that idea is present, ignoring wording."
+          },
+          {
+            "type": "not-contains",
+            "value": "I don't know based on the provided documents"
+          }
+        ]
+      },
+      {
+        "description": "Unanswerable: speed of light, but only biology context given",
+        "vars": {
+          "context": "[Source: biology-101]\nThe mitochondria is the powerhouse of the cell, responsible for producing ATP through cellular respiration.",
+          "query": "What is the speed of light?"
+        },
+        "assert": [
+          {
+            "type": "icontains",
+            "value": "I don't know based on the provided documents"
+          }
+        ]
+      },
+      {
+        "description": "Unanswerable with related-but-insufficient context",
+        "vars": {
+          "context": "[Source: ml-intro]\nDeep learning uses neural networks with many layers to model complex patterns in data.",
+          "query": "Who invented the transformer architecture?"
+        },
+        "assert": [
+          {
+            "type": "icontains",
+            "value": "I don't know based on the provided documents"
+          },
+          {
+            "type": "llm-rubric",
+            "value": "Does the answer avoid naming any specific person, year, or paper as the transformer's inventor? Answer yes if no such name/date is given."
+          }
+        ]
+      },
+      {
+        "description": "Multi-source grounding",
+        "vars": {
+          "context": "[Source: physics-101]\nThe speed of light in a vacuum is approximately 299,792 kilometers per second, often denoted as c in physics equations.\n\n[Source: geography]\nParis is the capital and most populous city of France.\n",
+          "query": "What is the speed of light?"
+        },
+        "assert": [
+          {
+            "type": "icontains",
+            "value": "299,792"
+          },
+          {
+            "type": "llm-rubric",
+            "value": "Does the answer state the speed of light is about 299,792 km/s? Answer yes if that number appears, regardless of wording."
+          }
+        ]
+      },
+      {
+        "description": "Must trust context over prior knowledge",
+        "vars": {
+          "context": "[Source: fictional-almanac]\nThe planet Zorbon has exactly three moons named Ay, Bee, and Cee.",
+          "query": "How many moons does Zorbon have, and what are their names?"
+        },
+        "assert": [
+          {
+            "type": "icontains",
+            "value": "three"
+          },
+          {
+            "type": "icontains",
+            "value": "Ay"
+          },
+          {
+            "type": "icontains",
+            "value": "Bee"
+          },
+          {
+            "type": "icontains",
+            "value": "Cee"
+          },
+          {
+            "type": "llm-rubric",
+            "value": "Does the answer say Zorbon has three moons named Ay, Bee, and Cee? Answer yes if those facts are present, ignoring wording or formatting."
+          }
+        ]
+      }
+    ],
+    "defaultTest": {
+      "options": {
+        "provider": "ollama:chat:llama3.2"
+      }
+    },
+    "outputPath": [
+      "results.json"
+    ],
+    "extensions": []
+  },
+  "shareableUrl": null,
+  "metadata": {
+    "promptfooVersion": "0.121.17",
+    "nodeVersion": "v22.23.0",
+    "platform": "darwin",
+    "arch": "arm64",
+    "exportedAt": "2026-06-22T18:25:20.520Z",
+    "evaluationCreatedAt": "2026-06-22T18:24:20.285Z"
+  },
+  "vars": [
+    "context",
+    "query"
+  ],
+  "runtimeOptions": {
+    "eventSource": "cli",
+    "showProgressBar": false,
+    "repeat": 1,
+    "maxConcurrency": 4,
+    "cache": false
+  }
+}

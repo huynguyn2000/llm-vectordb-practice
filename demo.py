@@ -7,6 +7,7 @@ Usage:
   python demo.py rag                # RAG chatbot only
   python demo.py products           # product similarity only
   python demo.py logs               # log anomaly clustering only
+  python demo.py ingest [dir]       # ingest a folder of .md/.txt/.pdf (default: data/corpus)
 """
 
 import sys
@@ -23,6 +24,18 @@ USE_CASES = {
 
 def main():
     selected = sys.argv[1].lower() if len(sys.argv) > 1 else "all"
+
+    if selected == "ingest":
+        from ingestion.ingest import ingest_directory
+
+        corpus_dir = sys.argv[2] if len(sys.argv) > 2 else "data/corpus"
+        with VectorStore() as store:
+            stats = ingest_directory(corpus_dir, store, Embedder())
+        print(
+            f"Ingested: {stats.ingested}  skipped (unchanged): {stats.skipped}  "
+            f"deleted: {stats.deleted}  failed: {stats.failed}"
+        )
+        return
 
     if selected not in USE_CASES and selected != "all":
         print(f"Unknown use case: {selected}")

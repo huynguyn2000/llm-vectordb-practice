@@ -58,3 +58,10 @@ class Chunk(BaseModel):
 class RawDocument(BaseModel):
     path: str
     text: str
+
+
+class IngestStats(BaseModel):
+    ingested: int = 0
+    skipped: int = 0
+    deleted: int = 0
+    failed: int = 0

@@ -69,8 +69,11 @@ def chunk_text(text: str, chunk_size: int = 600, overlap: int = 80) -> list[Chun
         piece_tokens = count_tokens(piece)
         if window and window_tokens + piece_tokens > chunk_size:
             raw_chunks.append("".join(window))
-            # Keep at most `overlap` tokens of tail pieces as shared context.
-            while window and window_tokens > overlap:
+            # Keep at most `overlap` tokens of tail pieces as shared context,
+            # but also ensure the tail + incoming piece won't exceed chunk_size.
+            while window and (
+                window_tokens > overlap or window_tokens + piece_tokens > chunk_size
+            ):
                 window_tokens -= count_tokens(window[0])
                 window.pop(0)
         window.append(piece)

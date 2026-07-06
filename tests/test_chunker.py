@@ -67,3 +67,12 @@ def test_overlap_must_be_smaller_than_chunk_size():
 
     with pytest.raises(ValueError):
         chunk_text("some text", chunk_size=100, overlap=100)
+
+
+def test_oversized_piece_after_overlap_carry_stays_within_limit():
+    # Small sentences leave a short overlap tail; the following hard-split
+    # piece nearly fills chunk_size on its own. Tail + piece must not
+    # produce an oversized chunk.
+    text = "a. b. " + "x" * 2000
+    chunks = chunk_text(text, chunk_size=100, overlap=30)
+    assert all(c.token_count <= 100 for c in chunks)

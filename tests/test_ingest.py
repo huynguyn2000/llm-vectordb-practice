@@ -1,7 +1,7 @@
 import pytest
 
 from ingestion.ingest import ingest_directory
-from tests.helpers import FakeEmbedder, build_pdf
+from tests.helpers import FakeEmbedder, build_pdf, _purge_test_rows
 
 pytestmark = pytest.mark.integration
 
@@ -21,14 +21,9 @@ def corpus(tmp_path):
 
 @pytest.fixture(autouse=True)
 def clean_store(store):
-    def _purge():
-        for path in list(store.get_source_hashes()):
-            if path.startswith("zz-test"):
-                store.delete_source(path)
-
-    _purge()
+    _purge_test_rows(store)
     yield store
-    _purge()
+    _purge_test_rows(store)
 
 
 def test_first_ingest_ingests_all_supported_files(store, corpus):
@@ -60,7 +55,7 @@ def test_removed_file_is_cleaned_up(store, corpus):
     stats = ingest_directory(corpus, store, FakeEmbedder())
     assert stats.deleted == 1
     assert stats.skipped == 2
-    assert "zz-test-plain.txt" not in store.get_source_hashes()
+    assert "zz-test-plain.txt" not in store.get_source_hashes(str(corpus.resolve()))
 
 
 def test_corrupt_pdf_is_counted_failed_and_run_continues(store, corpus):
@@ -68,3 +63,12 @@ def test_corrupt_pdf_is_counted_failed_and_run_continues(store, corpus):
     stats = ingest_directory(corpus, store, FakeEmbedder())
     assert stats.failed == 1
     assert stats.ingested == 3
+
+
+def test_ingest_does_not_delete_other_corpus(store, corpus, tmp_path_factory):
+    other = tmp_path_factory.mktemp("other-corpus")
+    (other / "zz-test-other.md").write_text("# A doc in another corpus.", encoding="utf-8")
+    ingest_directory(corpus, store, FakeEmbedder())
+    stats = ingest_directory(other, store, FakeEmbedder())
+    assert stats.deleted == 0
+    assert "zz-test-notes.md" in store.get_source_hashes(str(corpus.resolve()))

@@ -1,5 +1,7 @@
 """Idempotent directory ingestion: hash-diff against the sources table,
-then load -> chunk -> embed -> upsert per changed file."""
+then load -> chunk -> embed -> upsert per changed file. The deletion sweep
+is scoped to the ingested root so ingesting one directory cannot delete
+sources that belong to a different corpus."""
 
 import hashlib
 from pathlib import Path
@@ -14,9 +16,15 @@ from ingestion.loaders import SUPPORTED_EXTENSIONS, LoaderError, load_file
 def ingest_directory(
     directory: str | Path, store: VectorStore, embedder: Embedder
 ) -> IngestStats:
+    """Ingest all supported files under *directory* into *store*.
+
+    The deletion sweep is scoped to the resolved root path so that
+    ingesting one corpus cannot remove sources from another corpus.
+    """
     root = Path(directory)
+    root_key = str(root.resolve())
     stats = IngestStats()
-    known = store.get_source_hashes()
+    known = store.get_source_hashes(root_key)
     seen: set[str] = set()
 
     for path in sorted(root.rglob("*")):
@@ -45,15 +53,16 @@ def ingest_directory(
 
         embeddings = embedder.embed_many([c.content for c in chunks])
         store.upsert_source_with_chunks(
+            root_key,
             rel,
             content_hash,
             [(c.content, c.token_count, e) for c, e in zip(chunks, embeddings)],
         )
         stats.ingested += 1
 
-    # Sources that vanished from disk since the last run.
+    # Sources that vanished from disk since the last run (scoped to this root).
     for stale in set(known) - seen:
-        store.delete_source(stale)
+        store.delete_source(root_key, stale)
         stats.deleted += 1
 
     return stats

@@ -31,9 +31,11 @@ CREATE INDEX IF NOT EXISTS logs_embedding_idx ON logs USING hnsw (embedding vect
 
 CREATE TABLE IF NOT EXISTS sources (
     id SERIAL PRIMARY KEY,
-    path TEXT UNIQUE NOT NULL,
+    root TEXT NOT NULL,
+    path TEXT NOT NULL,
     content_hash TEXT NOT NULL,
-    ingested_at TIMESTAMPTZ DEFAULT NOW()
+    ingested_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE (root, path)
 );
 
 CREATE TABLE IF NOT EXISTS chunks (

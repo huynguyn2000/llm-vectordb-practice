@@ -151,14 +151,15 @@ class VectorStore:
 
     # --- Sources & chunks (file ingestion pipeline) ---
 
-    def get_source_hashes(self) -> dict[str, str]:
-        """path -> content_hash for every ingested source."""
+    def get_source_hashes(self, root: str) -> dict[str, str]:
+        """path -> content_hash for every source ingested from this root."""
         with self.conn.cursor() as cur:
-            cur.execute("SELECT path, content_hash FROM sources")
+            cur.execute("SELECT path, content_hash FROM sources WHERE root = %s", (root,))
             return {path: content_hash for path, content_hash in cur.fetchall()}
 
     def upsert_source_with_chunks(
         self,
+        root: str,
         path: str,
         content_hash: str,
         chunks: list[tuple[str, int, list[float]]],
@@ -169,13 +170,13 @@ class VectorStore:
         with self.conn.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO sources (path, content_hash)
-                VALUES (%s, %s)
-                ON CONFLICT (path)
+                INSERT INTO sources (root, path, content_hash)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (root, path)
                 DO UPDATE SET content_hash = EXCLUDED.content_hash, ingested_at = NOW()
                 RETURNING id
                 """,
-                (path, content_hash),
+                (root, path, content_hash),
             )
             source_id = cur.fetchone()[0]
             cur.execute("DELETE FROM chunks WHERE source_id = %s", (source_id,))
@@ -189,10 +190,10 @@ class VectorStore:
                 )
         self.conn.commit()
 
-    def delete_source(self, path: str) -> None:
+    def delete_source(self, root: str, path: str) -> None:
         """Remove a source; its chunks go with it via ON DELETE CASCADE."""
         with self.conn.cursor() as cur:
-            cur.execute("DELETE FROM sources WHERE path = %s", (path,))
+            cur.execute("DELETE FROM sources WHERE root = %s AND path = %s", (root, path))
         self.conn.commit()
 
     def search_chunks(self, embedding: list[float], top_k: int = 5) -> list[dict]:

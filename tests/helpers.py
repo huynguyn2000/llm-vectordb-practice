@@ -5,6 +5,13 @@ import hashlib
 import struct
 
 
+def _purge_test_rows(store) -> None:
+    """Delete all sources whose path starts with 'zz-test', regardless of root."""
+    with store.conn.cursor() as cur:
+        cur.execute("DELETE FROM sources WHERE path LIKE 'zz-test%'")
+    store.conn.commit()
+
+
 def fake_embedding(text: str, dim: int = 768) -> list[float]:
     """Deterministic pseudo-embedding: same text -> same vector. Lets DB and
     ingestion tests run without Ollama."""

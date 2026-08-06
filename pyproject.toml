@@ -11,6 +11,8 @@ dependencies = [
     "python-dotenv>=1.0",
     "numpy>=1.26",
     "scikit-learn>=1.4",
+    "tiktoken>=0.7",
+    "pypdf>=4.0",
 ]
 
 [project.optional-dependencies]
@@ -21,7 +23,10 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["core", "use_cases", "data"]
+packages = ["core", "use_cases", "data", "ingestion"]
 
 [tool.ruff]
 line-length = 100
+
+[tool.pytest.ini_options]
+markers = ["integration: requires a running Postgres (docker compose up -d)"]

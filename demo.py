@@ -61,6 +61,19 @@ def main():
             print(f" {i + 1:<5}{label(vec, i):<34}{label(hyb, i)}")
         return
 
+    if selected == "langchain":
+        from langchain_rag.chain import build_rag_chain
+
+        if len(sys.argv) < 3:
+            print('Usage: python demo.py langchain "<query>"')
+            return
+        query = sys.argv[2]
+        with VectorStore() as store:
+            chain = build_rag_chain(store, Embedder())
+            answer = chain.invoke(query)
+        print(f"\nQuestion: {query}\nAnswer:   {answer}")
+        return
+
     if selected not in USE_CASES and selected != "all":
         print(f"Unknown use case: {selected}")
         print(f"Available: {', '.join(USE_CASES)} or 'all'")

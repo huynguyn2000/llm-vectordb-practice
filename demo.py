@@ -37,6 +37,30 @@ def main():
         )
         return
 
+    if selected == "compare":
+        from use_cases.rag_chatbot import retrieve, retrieve_vector
+
+        if len(sys.argv) < 3:
+            print('Usage: python demo.py compare "<query>"')
+            return
+        query = sys.argv[2]
+        with VectorStore() as store:
+            embedder = Embedder()
+            vec = retrieve_vector(query, store, embedder, top_k=5)
+            hyb = retrieve(query, store, embedder, top_k=5)
+
+        def label(chunks, i):
+            if i >= len(chunks):
+                return ""
+            c = chunks[i]
+            return f"{c.source_path}#chunk{c.chunk_index}"
+
+        print(f'\nQuery: "{query}"\n')
+        print(f" {'rank':<5}{'vector-only':<34}{'hybrid (RRF)'}")
+        for i in range(max(len(vec), len(hyb))):
+            print(f" {i + 1:<5}{label(vec, i):<34}{label(hyb, i)}")
+        return
+
     if selected not in USE_CASES and selected != "all":
         print(f"Unknown use case: {selected}")
         print(f"Available: {', '.join(USE_CASES)} or 'all'")

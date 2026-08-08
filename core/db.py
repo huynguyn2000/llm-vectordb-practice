@@ -210,3 +210,22 @@ class VectorStore:
                 (embedding, embedding, top_k),
             )
             return [dict(r) for r in cur.fetchall()]
+
+    def search_chunks_keyword(self, query_text: str, top_k: int = 20) -> list[dict]:
+        """Full-text keyword search over chunks. Uses websearch_to_tsquery so
+        raw user input never raises; a query with no lexical matches returns
+        []. Same result shape as search_chunks."""
+        with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+            cur.execute(
+                """
+                SELECT c.id, c.content, c.chunk_index, s.path AS source_path,
+                       ts_rank(c.content_tsv, websearch_to_tsquery('english', %s)) AS score
+                FROM chunks c
+                JOIN sources s ON s.id = c.source_id
+                WHERE c.content_tsv @@ websearch_to_tsquery('english', %s)
+                ORDER BY score DESC
+                LIMIT %s
+                """,
+                (query_text, query_text, top_k),
+            )
+            return [dict(r) for r in cur.fetchall()]

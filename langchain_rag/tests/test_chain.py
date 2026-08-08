@@ -3,7 +3,7 @@ from langchain_core.documents import Document
 from langchain_core.runnables import Runnable
 
 from langchain_rag.chain import build_rag_chain, format_docs
-from tests.helpers import FakeEmbedder, _purge_test_rows, fake_embedding
+from tests.helpers import FakeEmbedder, _purge_test_rows
 
 
 def test_format_docs_citation():

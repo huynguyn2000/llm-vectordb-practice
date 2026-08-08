@@ -17,13 +17,14 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["ruff", "pytest"]
+langchain = ["langchain>=0.3,<0.4", "langchain-ollama>=0.2", "langsmith>=0.1"]
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["core", "use_cases", "data", "ingestion"]
+packages = ["core", "use_cases", "data", "ingestion", "search", "langchain_rag"]
 
 [tool.ruff]
 line-length = 100

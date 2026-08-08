@@ -15,6 +15,7 @@ from core.db import VectorStore
 from core.embedder import Embedder
 from core.models import ChunkResult
 from ingestion.ingest import ingest_directory
+from search.hybrid import hybrid_search
 
 load_dotenv()
 
@@ -22,12 +23,19 @@ LLM_MODEL = os.getenv("LLM_MODEL", "llama3.2")
 CORPUS_DIR = "data/corpus"
 
 
-def retrieve(
+def retrieve_vector(
     query: str, store: VectorStore, embedder: Embedder, top_k: int = 3
 ) -> list[ChunkResult]:
+    """Vector-only retrieval — kept for the `demo.py compare` subcommand."""
     embedding = embedder.embed(query)
     rows = store.search_chunks(embedding, top_k=top_k)
     return [ChunkResult(**r) for r in rows]
+
+
+def retrieve(
+    query: str, store: VectorStore, embedder: Embedder, top_k: int = 3
+) -> list[ChunkResult]:
+    return hybrid_search(query, store, embedder, top_k=top_k)
 
 
 def generate_answer(query: str, context_chunks: list[ChunkResult]) -> str:

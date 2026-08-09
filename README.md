@@ -119,16 +119,25 @@ deterministically with fakes — no Ollama needed for the tests.
 ### Visualize it (LangGraph Studio)
 
 ```bash
+source .venv/bin/activate            # langgraph lives in the venv (or prefix: .venv/bin/langgraph)
 docker compose up -d                 # Postgres + Ollama
 pip install -e ".[langchain]"        # includes langgraph-cli
-langgraph dev                        # starts a local LangGraph server + opens Studio
+langgraph dev --allow-blocking       # local LangGraph server + Studio
 ```
 
 `langgraph dev` serves the graph (defined in `langgraph.json`) and opens
 LangGraph Studio in the browser, where you can see the
 `retrieve → grade_documents → {generate | transform_query}` graph and step
-through runs. (The Studio browser UI may prompt for a free LangSmith login;
-the local server itself runs without one.)
+through runs.
+
+`--allow-blocking` is required: the graph factory (`langgraph_rag/studio.py`)
+builds the real agent, which does synchronous I/O (loading `.env`, connecting
+to Postgres via psycopg2). Without the flag, `langgraph dev`'s async guard
+rejects those calls with a `BlockingError` and the graph fails to preview.
+
+Notes: the Studio browser UI may prompt for a free LangSmith login (the local
+server itself runs without one); LangSmith run-tracing is off unless you set
+`LANGSMITH_API_KEY` in `.env`.
 
 ## Testing
 

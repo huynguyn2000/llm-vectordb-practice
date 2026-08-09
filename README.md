@@ -116,6 +116,20 @@ The graph (`retrieve → grade_documents → {generate | transform_query → ret
 is built with injected retriever + chat model, so its control flow is unit-tested
 deterministically with fakes — no Ollama needed for the tests.
 
+### Visualize it (LangGraph Studio)
+
+```bash
+docker compose up -d                 # Postgres + Ollama
+pip install -e ".[langchain]"        # includes langgraph-cli
+langgraph dev                        # starts a local LangGraph server + opens Studio
+```
+
+`langgraph dev` serves the graph (defined in `langgraph.json`) and opens
+LangGraph Studio in the browser, where you can see the
+`retrieve → grade_documents → {generate | transform_query}` graph and step
+through runs. (The Studio browser UI may prompt for a free LangSmith login;
+the local server itself runs without one.)
+
 ## Testing
 
 ```bash

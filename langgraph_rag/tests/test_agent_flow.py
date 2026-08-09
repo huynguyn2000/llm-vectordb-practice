@@ -36,3 +36,14 @@ def test_retry_loop_grade_no_then_transform_then_generate():
     result = _run(build_graph(_fixed_retriever(), llm), "vague query")
     assert result["attempts"] == 2
     assert result["generation"] == "Looped answer."
+
+
+def test_exhausted_retries_generates_with_empty_docs():
+    # Grader always says "no": round1 grade(no)->transform->round2 grade(no)->
+    # attempts hits max_attempts(2) so the decider routes to generate with
+    # empty documents (the loop-termination cap branch).
+    llm = FakeListChatModel(responses=["no", "rewritten question", "no", "final answer"])
+    result = _run(build_graph(_fixed_retriever(), llm), "vague query")
+    assert result["attempts"] == 2
+    assert result["documents"] == []          # generate reached via the cap, not via relevant docs
+    assert result["generation"] == "final answer"

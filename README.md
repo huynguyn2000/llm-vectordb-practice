@@ -11,6 +11,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 | `python demo.py semantic` | Semantic search over documents |
 | `python demo.py rag` | RAG chatbot (retrieve + generate) |
 | `python demo.py langchain "<query>"` | RAG answer via the LangChain LCEL chain (same hybrid retrieval, local Ollama) |
+| `python demo.py agent "<query>"` | Agentic RAG via LangGraph (retrieve → grade → rewrite-and-retry → generate) |
 | `python demo.py products` | Product / item similarity |
 | `python demo.py logs` | Log anomaly detection via clustering |
 | `python demo.py` | All four demos (semantic, rag, products, logs) |
@@ -23,6 +24,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 - **Ingestion**: recursive token-aware chunking (tiktoken `cl100k_base`, 600-token chunks, 80-token overlap), idempotent re-ingest via SHA-256 content hashes
 - **Hybrid search**: pgvector cosine + Postgres full-text (`tsvector`), fused with Reciprocal Rank Fusion (k=60)
 - **LangChain**: an LCEL RAG chain (`langchain-ollama`) over the same hybrid retrieval, with optional LangSmith tracing
+- **LangGraph**: a CRAG-lite agentic RAG graph (retrieve → grade documents → corrective retry → generate) over the same retrieval
 
 ## Quickstart
 
@@ -65,6 +67,10 @@ use_cases/
 langchain_rag/
   retriever.py   # BaseRetriever wrapping hybrid_search -> LangChain Documents
   chain.py       # LCEL RAG chain (retriever -> prompt -> ChatOllama)
+langgraph_rag/
+  state.py       # AgentState (TypedDict)
+  nodes.py       # retrieve / grade_documents / generate / transform_query
+  graph.py       # build_graph (CRAG-lite StateGraph) + build_agent
 data/
   corpus/        # sample corpus ingested by the RAG chatbot
   documents.py   # Sample document corpus
@@ -94,6 +100,21 @@ LANGCHAIN_PROJECT=llm-vectordb-practice
 
 The chain is tagged (`run_name="langchain_rag"`, tags `rag`/`hybrid`) so traces
 are legible in the LangSmith UI.
+
+## Agentic RAG (LangGraph)
+
+A LangGraph agent adds a corrective loop on top of retrieval: it retrieves,
+LLM-grades each document's relevance, and if nothing relevant is found it
+rewrites the query and retries (bounded), before generating.
+
+```bash
+pip install -e ".[langchain]"
+python demo.py agent "what is machine learning"
+```
+
+The graph (`retrieve → grade_documents → {generate | transform_query → retrieve}`)
+is built with injected retriever + chat model, so its control flow is unit-tested
+deterministically with fakes — no Ollama needed for the tests.
 
 ## Testing
 

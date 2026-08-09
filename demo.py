@@ -74,6 +74,21 @@ def main():
         print(f"\nQuestion: {query}\nAnswer:   {answer}")
         return
 
+    if selected == "agent":
+        from langgraph_rag.graph import build_agent
+
+        if len(sys.argv) < 3:
+            print('Usage: python demo.py agent "<query>"')
+            return
+        query = sys.argv[2]
+        with VectorStore() as store:
+            graph = build_agent(store, Embedder())
+            result = graph.invoke(
+                {"question": query, "documents": [], "generation": "", "attempts": 0}
+            )
+        print(f"\nQuestion: {query}\nAnswer:   {result['generation']}")
+        return
+
     if selected not in USE_CASES and selected != "all":
         print(f"Unknown use case: {selected}")
         print(f"Available: {', '.join(USE_CASES)} or 'all'")

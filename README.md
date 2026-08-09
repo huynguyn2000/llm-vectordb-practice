@@ -25,6 +25,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 - **Hybrid search**: pgvector cosine + Postgres full-text (`tsvector`), fused with Reciprocal Rank Fusion (k=60)
 - **LangChain**: an LCEL RAG chain (`langchain-ollama`) over the same hybrid retrieval, with optional LangSmith tracing
 - **LangGraph**: a CRAG-lite agentic RAG graph (retrieve → grade documents → corrective retry → generate) over the same retrieval
+- **Orchestration**: Dagster — the ingestion pipeline as assets (`corpus_source → pgvector_chunks`) with an asset check and a daily schedule; run locally with `dagster dev`
 
 ## Quickstart
 
@@ -59,6 +60,10 @@ ingestion/
 search/
   fusion.py      # reciprocal rank fusion (pure function)
   hybrid.py      # vector + keyword retrieval fused into one ranking
+orchestration/
+  resources.py   # Dagster resources: VectorStore + Embedder (dependency injection)
+  assets.py      # corpus_source, pgvector_chunks assets + chunks_present check
+  definitions.py # Dagster code location: assets, check, job, daily schedule
 use_cases/
   semantic_search.py    # Index + query documents by meaning
   rag_chatbot.py        # Retrieve context + generate answer with LLM
@@ -100,6 +105,20 @@ LANGCHAIN_PROJECT=llm-vectordb-practice
 
 The chain is tagged (`run_name="langchain_rag"`, tags `rag`/`hybrid`) so traces
 are legible in the LangSmith UI.
+## Orchestration (Dagster)
+
+The file-ingestion pipeline is orchestrated by Dagster as assets. Run it locally:
+
+```bash
+docker compose up -d                 # Postgres (pgvector) + Ollama
+pip install -e ".[orchestration]"    # dagster + dagster-webserver
+dagster dev                          # UI at http://localhost:3000
+```
+
+In the UI, materialize `pgvector_chunks` (it depends on `corpus_source`) or wait
+for the daily schedule. The `chunks_present` asset check verifies pgvector holds
+at least one chunk after each run. Ingestion is idempotent (SHA-256 hash-diff),
+so scheduled re-runs only re-embed changed files.
 
 ## Agentic RAG (LangGraph)
 

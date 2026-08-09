@@ -10,6 +10,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 | `python demo.py compare "<query>"` | Compare vector-only vs hybrid (RRF) retrieval rankings side by side |
 | `python demo.py semantic` | Semantic search over documents |
 | `python demo.py rag` | RAG chatbot (retrieve + generate) |
+| `python demo.py langchain "<query>"` | RAG answer via the LangChain LCEL chain (same hybrid retrieval, local Ollama) |
 | `python demo.py products` | Product / item similarity |
 | `python demo.py logs` | Log anomaly detection via clustering |
 | `python demo.py` | All four demos (semantic, rag, products, logs) |
@@ -21,6 +22,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 - **LLM**: Ollama `llama3.2` (local, used in RAG chatbot)
 - **Ingestion**: recursive token-aware chunking (tiktoken `cl100k_base`, 600-token chunks, 80-token overlap), idempotent re-ingest via SHA-256 content hashes
 - **Hybrid search**: pgvector cosine + Postgres full-text (`tsvector`), fused with Reciprocal Rank Fusion (k=60)
+- **LangChain**: an LCEL RAG chain (`langchain-ollama`) over the same hybrid retrieval, with optional LangSmith tracing
 - **Orchestration**: Dagster — the ingestion pipeline as assets (`corpus_source → pgvector_chunks`) with an asset check and a daily schedule; run locally with `dagster dev`
 
 ## Quickstart
@@ -65,6 +67,9 @@ use_cases/
   rag_chatbot.py        # Retrieve context + generate answer with LLM
   product_similarity.py # Find similar products by description
   log_clustering.py     # Detect anomalous log entries
+langchain_rag/
+  retriever.py   # BaseRetriever wrapping hybrid_search -> LangChain Documents
+  chain.py       # LCEL RAG chain (retriever -> prompt -> ChatOllama)
 data/
   corpus/        # sample corpus ingested by the RAG chatbot
   documents.py   # Sample document corpus
@@ -74,6 +79,26 @@ tests/           # pytest suite (unit + `-m integration`)
 demo.py          # CLI runner
 ```
 
+## LangChain & LangSmith
+
+A LangChain LCEL variant of the RAG pipeline reuses the same hybrid retrieval:
+
+```bash
+pip install -e ".[langchain]"
+python demo.py langchain "what is machine learning"
+```
+
+To trace runs in **LangSmith**, set the env vars in `.env` (a free key from
+smith.langchain.com) — tracing is off by default:
+
+```bash
+LANGCHAIN_TRACING_V2=true
+LANGCHAIN_API_KEY=ls-...
+LANGCHAIN_PROJECT=llm-vectordb-practice
+```
+
+The chain is tagged (`run_name="langchain_rag"`, tags `rag`/`hybrid`) so traces
+are legible in the LangSmith UI.
 ## Orchestration (Dagster)
 
 The file-ingestion pipeline is orchestrated by Dagster as assets. Run it locally:

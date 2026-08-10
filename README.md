@@ -114,6 +114,13 @@ python demo.py ingest data/corpus
 With the extra installed, `.pdf` and `.docx` are converted via Docling; without
 it, `.pdf` still works via the pypdf fallback and `.docx` raises a clear error.
 
+> **Heads-up — install Docling in a separate venv.** Docling pins
+> `antlr4-python3-runtime` 4.9.x, which is incompatible with Dagster's generated
+> asset-selection lexer (fails with `TypeError: ord() ...`). So the `docling`
+> and `orchestration` extras can't share one environment. Use a dedicated venv
+> for Docling-based ingestion; keep the default/dev venv (with Dagster, tests)
+> Docling-free — the pypdf fallback keeps PDFs working there.
+
 ## Orchestration (Dagster)
 
 The file-ingestion pipeline is orchestrated by Dagster as assets. Run it locally:

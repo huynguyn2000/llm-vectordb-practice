@@ -11,6 +11,8 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 | `python demo.py semantic` | Semantic search over documents |
 | `python demo.py rag` | RAG chatbot (retrieve + generate) |
 | `python demo.py langchain "<query>"` | RAG answer via the LangChain LCEL chain (same hybrid retrieval, local Ollama) |
+| `python demo.py router "<q>"` | Query routing (classify question type, generate answer per route) |
+| `python demo.py reflect "<task>"` | Reflection agent (generate draft → critique → revise, with approval gate) |
 | `python demo.py products` | Product / item similarity |
 | `python demo.py logs` | Log anomaly detection via clustering |
 | `python demo.py` | All four demos (semantic, rag, products, logs) |
@@ -23,6 +25,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 - **Ingestion**: recursive token-aware chunking (tiktoken `cl100k_base`, 600-token chunks, 80-token overlap), idempotent re-ingest via SHA-256 content hashes
 - **Hybrid search**: pgvector cosine + Postgres full-text (`tsvector`), fused with Reciprocal Rank Fusion (k=60)
 - **LangChain**: an LCEL RAG chain (`langchain-ollama`) over the same hybrid retrieval, with optional LangSmith tracing
+- **Agent patterns**: LangGraph graphs — query routing and reflection (generate→critique→revise) — alongside the hybrid retrieval; ReAct (tool-calling) and supervisor/multi-agent are documented next patterns
 - **Orchestration**: Dagster — the ingestion pipeline as assets (`corpus_source → pgvector_chunks`) with an asset check and a daily schedule; run locally with `dagster dev`
 
 ## Quickstart
@@ -67,6 +70,10 @@ use_cases/
   rag_chatbot.py        # Retrieve context + generate answer with LLM
   product_similarity.py # Find similar products by description
   log_clustering.py     # Detect anomalous log entries
+agent_patterns/
+  router.py      # LangGraph multi-route query classifier + answer generator
+  reflection.py  # LangGraph reflection loop (generate → critique → revise)
+  tests/         # Unit tests for router and reflection
 langchain_rag/
   retriever.py   # BaseRetriever wrapping hybrid_search -> LangChain Documents
   chain.py       # LCEL RAG chain (retriever -> prompt -> ChatOllama)
@@ -130,3 +137,13 @@ pytest -m integration     # DB tests — needs `docker compose up -d` (no Ollama
 **Product Similarity**: embeds `name + description` together and searches by natural-language query — no keyword matching required.
 
 **Log Anomaly Detection**: two modes — (1) similarity search to find logs like a reference, (2) outlier scoring where anomaly = high mean cosine distance from all other logs.
+
+## Agent Patterns
+
+LangGraph builds agentic workflows that combine LLM reasoning with structured control flow.
+
+**Router**: A multi-route classifier graph — takes a question, routes it to one of several LLM branches (e.g., database query, math reasoning, general knowledge), and returns a route label and answer. Run with `python demo.py router "<question>"`.
+
+**Reflection**: A self-improving loop — generates a draft, critiques it, applies revisions if needed (up to a max count), and exits with an approval decision. Run with `python demo.py reflect "<task>"`.
+
+Both graphs use the same `ChatOllama` instance and are testable with fake-LLM mocks. **ReAct** (Reasoning + Acting with tool calls) and **Supervisor** (multi-agent coordination) are natural next patterns — they require a tool-calling model, so they are documented but not built here.

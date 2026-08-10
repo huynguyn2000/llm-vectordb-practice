@@ -74,6 +74,34 @@ def main():
         print(f"\nQuestion: {query}\nAnswer:   {answer}")
         return
 
+    if selected in ("router", "reflect"):
+        if len(sys.argv) < 3:
+            print(f'Usage: python demo.py {selected} "<text>"')
+            return
+        import os
+
+        from langchain_ollama import ChatOllama
+
+        llm = ChatOllama(
+            model=os.getenv("LLM_MODEL", "llama3.2"),
+            base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
+            temperature=0,
+        )
+        text = sys.argv[2]
+        if selected == "router":
+            from agent_patterns.router import build_router_graph
+
+            r = build_router_graph(llm).invoke({"question": text, "route": "", "answer": ""})
+            print(f"route: {r['route']}\nanswer: {r['answer']}")
+        else:
+            from agent_patterns.reflection import build_reflection_graph
+
+            r = build_reflection_graph(llm).invoke(
+                {"task": text, "draft": "", "critique": "", "revisions": 0, "approved": False}
+            )
+            print(f"revisions: {r['revisions']}\napproved: {r['approved']}\ndraft: {r['draft']}")
+        return
+
     if selected not in USE_CASES and selected != "all":
         print(f"Unknown use case: {selected}")
         print(f"Available: {', '.join(USE_CASES)} or 'all'")

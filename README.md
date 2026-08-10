@@ -117,7 +117,7 @@ python demo.py ingest data/warehouse_corpus
 ```
 
 The dbt project in `de/dbt/` transforms seed data (CSV) through staging models into a
-`documents` mart with `title` and `content` fields, exported as markdown files. This
+`documents` mart with `id`, `source`, and `content` fields, exported as markdown files. This
 demonstrates RAG over structured data pipelines. For production orchestration, the
 natural integration is **dagster-dbt** (decorates dbt nodes as Dagster assets), which
 is not wired in this demo but shows the path to production data-engineering + RAG

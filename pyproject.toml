@@ -19,13 +19,14 @@ dependencies = [
 dev = ["ruff", "pytest"]
 langchain = ["langchain>=0.3,<0.4", "langchain-ollama>=0.2", "langsmith>=0.1"]
 orchestration = ["dagster>=1.8,<2", "dagster-webserver>=1.8,<2"]
+chroma = ["chromadb>=0.5"]
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["core", "use_cases", "data", "ingestion", "search", "langchain_rag","orchestration"]
+packages = ["core", "use_cases", "data", "ingestion", "search", "langchain_rag","orchestration", "vectorstores", "vectorstores.tests"]
 
 [tool.ruff]
 line-length = 100

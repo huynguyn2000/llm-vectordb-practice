@@ -13,6 +13,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 | `python demo.py langchain "<query>"` | RAG answer via the LangChain LCEL chain (same hybrid retrieval, local Ollama) |
 | `python demo.py products` | Product / item similarity |
 | `python demo.py logs` | Log anomaly detection via clustering |
+| `python demo.py memory "<user_id>"` | Store + recall user memories via Mem0 (local Ollama + Chroma) |
 | `python demo.py` | All four demos (semantic, rag, products, logs) |
 
 ## Stack
@@ -24,6 +25,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 - **Hybrid search**: pgvector cosine + Postgres full-text (`tsvector`), fused with Reciprocal Rank Fusion (k=60)
 - **LangChain**: an LCEL RAG chain (`langchain-ollama`) over the same hybrid retrieval, with optional LangSmith tracing
 - **Orchestration**: Dagster — the ingestion pipeline as assets (`corpus_source → pgvector_chunks`) with an asset check and a daily schedule; run locally with `dagster dev`
+- **Memory**: Mem0 memory layer (local Ollama + Chroma) — `remember`/`recall` user facts across turns (opt-in `memory` extra)
 
 ## Quickstart
 
@@ -70,6 +72,9 @@ use_cases/
 langchain_rag/
   retriever.py   # BaseRetriever wrapping hybrid_search -> LangChain Documents
   chain.py       # LCEL RAG chain (retriever -> prompt -> ChatOllama)
+memory/
+  config.py      # build_memory_config — pure, local Ollama + Chroma config (no mem0 import)
+  store.py       # build_memory/remember/recall — thin Mem0 wrapper, mem0 imported lazily
 data/
   corpus/        # sample corpus ingested by the RAG chatbot
   documents.py   # Sample document corpus
@@ -113,6 +118,27 @@ In the UI, materialize `pgvector_chunks` (it depends on `corpus_source`) or wait
 for the daily schedule. The `chunks_present` asset check verifies pgvector holds
 at least one chunk after each run. Ingestion is idempotent (SHA-256 hash-diff),
 so scheduled re-runs only re-embed changed files.
+
+## Memory (Mem0)
+
+A local Mem0 layer stores and recalls per-user facts across turns (`memory/config.py`
++ `memory/store.py`), fully local by default (Ollama LLM + embedder, Chroma vector
+store):
+
+```bash
+pip install -e ".[memory]"
+python demo.py memory "<user_id>"   # defaults to "demo-user"
+```
+
+**Caveat**: `mem0ai` pulls a heavy dependency tree (qdrant-client, posthog, etc.) and
+local fact extraction runs an LLM call per stored memory, which is slow on Ollama —
+install it in a separate venv rather than the dev one, or point `LLM_MODEL`/
+`OLLAMA_BASE_URL` at a faster/API-backed LLM for real use. `mem0ai`'s `Memory.search`
+API has also changed across versions (newer releases require `filters={"user_id":
+...}` instead of a top-level `user_id=` kwarg) — pin a version you've verified against
+`memory/store.py` if you hit a `ValueError` from `search()`. Wiring this into the
+LangGraph agent so it remembers user facts across conversations is the natural next
+step.
 
 ## Testing
 

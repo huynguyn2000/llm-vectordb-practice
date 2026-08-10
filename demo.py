@@ -7,6 +7,7 @@ Usage:
   python demo.py rag                # RAG chatbot only
   python demo.py products           # product similarity only
   python demo.py logs               # log anomaly clustering only
+  python demo.py warehouse          # build DuckDB/dbt warehouse + export documents
   python demo.py ingest [dir]       # ingest a folder of .md/.txt/.pdf (default: data/corpus)
 """
 
@@ -72,6 +73,23 @@ def main():
             chain = build_rag_chain(store, Embedder())
             answer = chain.invoke(query)
         print(f"\nQuestion: {query}\nAnswer:   {answer}")
+        return
+
+    if selected == "warehouse":
+        try:
+            from de.pipeline import export_documents, run_dbt, write_corpus
+        except ImportError as exc:
+            print(exc)
+            return
+        try:
+            run_dbt()
+            rows = export_documents()
+        except (ImportError, RuntimeError) as exc:
+            print(exc)
+            return
+        n = write_corpus(rows)
+        print(f"Built {n} documents from the DuckDB/dbt warehouse -> data/warehouse_corpus/")
+        print("Next: python demo.py ingest data/warehouse_corpus")
         return
 
     if selected not in USE_CASES and selected != "all":

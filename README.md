@@ -6,6 +6,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 
 | Command | What it demonstrates |
 |---|---|
+| `python demo.py warehouse` | Build a DuckDB warehouse with dbt and export its `documents` mart to a RAG corpus |
 | `python demo.py ingest [dir]` | Ingest a folder of .md/.txt/.pdf into chunked, embedded storage (default `data/corpus`) |
 | `python demo.py compare "<query>"` | Compare vector-only vs hybrid (RRF) retrieval rankings side by side |
 | `python demo.py semantic` | Semantic search over documents |
@@ -23,6 +24,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 - **Ingestion**: recursive token-aware chunking (tiktoken `cl100k_base`, 600-token chunks, 80-token overlap), idempotent re-ingest via SHA-256 content hashes
 - **Hybrid search**: pgvector cosine + Postgres full-text (`tsvector`), fused with Reciprocal Rank Fusion (k=60)
 - **LangChain**: an LCEL RAG chain (`langchain-ollama`) over the same hybrid retrieval, with optional LangSmith tracing
+- **Structured source (DE)**: a DuckDB warehouse transformed by dbt (seed → staging → `documents` mart), exported to a corpus the RAG pipeline ingests — RAG on top of real data-engineering work
 - **Orchestration**: Dagster — the ingestion pipeline as assets (`corpus_source → pgvector_chunks`) with an asset check and a daily schedule; run locally with `dagster dev`
 
 ## Quickstart
@@ -70,6 +72,9 @@ use_cases/
 langchain_rag/
   retriever.py   # BaseRetriever wrapping hybrid_search -> LangChain Documents
   chain.py       # LCEL RAG chain (retriever -> prompt -> ChatOllama)
+de/
+  dbt/           # dbt project: seed (faq.csv) → staging → documents mart (SQL models)
+  pipeline.py    # run_dbt, export_documents, write_corpus (warehouse → corpus export)
 data/
   corpus/        # sample corpus ingested by the RAG chatbot
   documents.py   # Sample document corpus
@@ -99,6 +104,25 @@ LANGCHAIN_PROJECT=llm-vectordb-practice
 
 The chain is tagged (`run_name="langchain_rag"`, tags `rag`/`hybrid`) so traces
 are legible in the LangSmith UI.
+
+## Structured source (DuckDB + dbt)
+
+Rather than ingesting just unstructured documents, the RAG pipeline can consume a
+DuckDB warehouse transformed by dbt:
+
+```bash
+pip install -e ".[de]"
+python demo.py warehouse     # Runs dbt (seed → staging → documents mart) + exports to data/warehouse_corpus/
+python demo.py ingest data/warehouse_corpus
+```
+
+The dbt project in `de/dbt/` transforms seed data (CSV) through staging models into a
+`documents` mart with `title` and `content` fields, exported as markdown files. This
+demonstrates RAG over structured data pipelines. For production orchestration, the
+natural integration is **dagster-dbt** (decorates dbt nodes as Dagster assets), which
+is not wired in this demo but shows the path to production data-engineering + RAG
+workflows.
+
 ## Orchestration (Dagster)
 
 The file-ingestion pipeline is orchestrated by Dagster as assets. Run it locally:

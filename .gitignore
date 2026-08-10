@@ -13,3 +13,8 @@ __pycache__/
 
 # OS
 .DS_Store
+
+# local demo artifact stores (mem0/chroma/langgraph dev)
+.mem0_chroma/
+.chroma/
+.langgraph_api/

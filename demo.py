@@ -61,6 +61,35 @@ def main():
             print(f" {i + 1:<5}{label(vec, i):<34}{label(hyb, i)}")
         return
 
+    if selected == "vsdb":
+        if len(sys.argv) < 3:
+            print('Usage: python demo.py vsdb "<query>"')
+            return
+        try:
+            from vectorstores.corpus import build_chroma_backend_from_corpus
+            from vectorstores.pgvector import PgvectorBackend
+        except ImportError:
+            print("Install the chroma extra: pip install -e '.[chroma]'")
+            return
+        query = sys.argv[2]
+        with VectorStore() as store:
+            embedder = Embedder()
+            emb = embedder.embed(query)
+            pg = PgvectorBackend(store).search(emb, top_k=5)
+            chroma = build_chroma_backend_from_corpus("data/corpus", embedder).search(emb, top_k=5)
+
+        def label(rows, i):
+            if i >= len(rows):
+                return ""
+            r = rows[i]
+            return f"{r['source_path']}#chunk{r['chunk_index']} ({r['score']:.3f})"
+
+        print(f'\nQuery: "{query}"\n')
+        print(f" {'rank':<5}{'pgvector':<40}{'chroma'}")
+        for i in range(max(len(pg), len(chroma))):
+            print(f" {i + 1:<5}{label(pg, i):<40}{label(chroma, i)}")
+        return
+
     if selected == "langchain":
         from langchain_rag.chain import build_rag_chain
 

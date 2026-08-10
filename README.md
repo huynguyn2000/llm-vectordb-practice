@@ -8,6 +8,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 |---|---|
 | `python demo.py ingest [dir]` | Ingest a folder of .md/.txt/.pdf into chunked, embedded storage (default `data/corpus`) |
 | `python demo.py compare "<query>"` | Compare vector-only vs hybrid (RRF) retrieval rankings side by side |
+| `python demo.py vsdb "<query>"` | Compare pgvector vs ChromaDB vector search side by side |
 | `python demo.py semantic` | Semantic search over documents |
 | `python demo.py rag` | RAG chatbot (retrieve + generate) |
 | `python demo.py langchain "<query>"` | RAG answer via the LangChain LCEL chain (same hybrid retrieval, local Ollama) |
@@ -21,6 +22,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 - **Embeddings**: Ollama `nomic-embed-text` (768-dim, local)
 - **LLM**: Ollama `llama3.2` (local, used in RAG chatbot)
 - **Ingestion**: recursive token-aware chunking (tiktoken `cl100k_base`, 600-token chunks, 80-token overlap), idempotent re-ingest via SHA-256 content hashes
+- **Vector-store abstraction**: a `VectorBackend` protocol with pgvector and ChromaDB (embedded) backends; `demo.py vsdb` compares them (Weaviate is a documented next adapter)
 - **Hybrid search**: pgvector cosine + Postgres full-text (`tsvector`), fused with Reciprocal Rank Fusion (k=60)
 - **LangChain**: an LCEL RAG chain (`langchain-ollama`) over the same hybrid retrieval, with optional LangSmith tracing
 - **Orchestration**: Dagster — the ingestion pipeline as assets (`corpus_source → pgvector_chunks`) with an asset check and a daily schedule; run locally with `dagster dev`
@@ -58,6 +60,11 @@ ingestion/
 search/
   fusion.py      # reciprocal rank fusion (pure function)
   hybrid.py      # vector + keyword retrieval fused into one ranking
+vectorstores/
+  base.py        # VectorBackend protocol (abstraction for vector stores)
+  pgvector.py    # PgvectorBackend — queries pgvector in PostgreSQL
+  chroma.py      # ChromaBackend — embedded ChromaDB
+  corpus.py      # build_chroma_backend_from_corpus utility
 orchestration/
   resources.py   # Dagster resources: VectorStore + Embedder (dependency injection)
   assets.py      # corpus_source, pgvector_chunks assets + chunks_present check
@@ -113,6 +120,22 @@ In the UI, materialize `pgvector_chunks` (it depends on `corpus_source`) or wait
 for the daily schedule. The `chunks_present` asset check verifies pgvector holds
 at least one chunk after each run. Ingestion is idempotent (SHA-256 hash-diff),
 so scheduled re-runs only re-embed changed files.
+
+## Vector-DB Comparison
+
+This project includes a `VectorBackend` abstraction that allows comparing different vector databases side by side. Currently supported:
+
+- **pgvector** (PostgreSQL extension) — production-ready, HNSW index, runs on existing Postgres infrastructure
+- **ChromaDB** (embedded) — lightweight, file-based, good for prototyping and offline scenarios
+
+Compare search rankings with:
+
+```bash
+pip install -e ".[chroma]"                      # Install chromadb extra
+python demo.py vsdb "what are vector databases for"
+```
+
+The `demo.py vsdb` command embeds the query once and retrieves top-5 results from both backends, showing source file, chunk index, and similarity score. Future adapters (e.g. Weaviate) slot in as additional `VectorBackend` implementations.
 
 ## Testing
 

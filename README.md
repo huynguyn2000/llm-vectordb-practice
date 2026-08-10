@@ -21,6 +21,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 - **Embeddings**: Ollama `nomic-embed-text` (768-dim, local)
 - **LLM**: Ollama `llama3.2` (local, used in RAG chatbot)
 - **Ingestion**: recursive token-aware chunking (tiktoken `cl100k_base`, 600-token chunks, 80-token overlap), idempotent re-ingest via SHA-256 content hashes
+- **Document parsing**: Docling (layout/table-aware → Markdown) for `.pdf`/`.docx` via the `docling` extra; falls back to `pypdf` for PDFs when the extra isn't installed
 - **Hybrid search**: pgvector cosine + Postgres full-text (`tsvector`), fused with Reciprocal Rank Fusion (k=60)
 - **LangChain**: an LCEL RAG chain (`langchain-ollama`) over the same hybrid retrieval, with optional LangSmith tracing
 - **Orchestration**: Dagster — the ingestion pipeline as assets (`corpus_source → pgvector_chunks`) with an asset check and a daily schedule; run locally with `dagster dev`
@@ -52,7 +53,7 @@ core/
   embedder.py    # Ollama embedding client
   models.py      # Pydantic models
 ingestion/
-  loaders.py     # file -> text (.md/.txt/.pdf)
+  loaders.py     # file -> text (.md/.txt plain; .pdf/.docx via Docling, pypdf fallback)
   chunker.py     # text -> token-sized chunks with overlap
   ingest.py      # hash-diff orchestration: load -> chunk -> embed -> upsert
 search/
@@ -99,6 +100,20 @@ LANGCHAIN_PROJECT=llm-vectordb-practice
 
 The chain is tagged (`run_name="langchain_rag"`, tags `rag`/`hybrid`) so traces
 are legible in the LangSmith UI.
+
+## Better parsing with Docling
+
+By default, PDFs are parsed with `pypdf` (light, text-only). For layout- and
+table-aware parsing (PDF/DOCX → Markdown), install the Docling extra:
+
+```bash
+pip install -e ".[docling]"     # pulls torch; first convert downloads ~GB of models
+python demo.py ingest data/corpus
+```
+
+With the extra installed, `.pdf` and `.docx` are converted via Docling; without
+it, `.pdf` still works via the pypdf fallback and `.docx` raises a clear error.
+
 ## Orchestration (Dagster)
 
 The file-ingestion pipeline is orchestrated by Dagster as assets. Run it locally:

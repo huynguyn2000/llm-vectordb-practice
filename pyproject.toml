@@ -17,6 +17,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["ruff", "pytest"]
+docling = ["docling>=2.0"]
 langchain = ["langchain>=0.3,<0.4", "langchain-ollama>=0.2", "langsmith>=0.1"]
 orchestration = ["dagster>=1.8,<2", "dagster-webserver>=1.8,<2"]
 

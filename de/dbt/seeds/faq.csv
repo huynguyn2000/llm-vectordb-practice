@@ -1,0 +1,9 @@
+id,question,answer,topic
+1,What is a vector database?,A vector database indexes high-dimensional embeddings so nearest-neighbor similarity search stays fast across millions of items.,vectors
+2,What is an embedding?,An embedding is a dense numeric vector that represents the meaning of text so similar text has nearby vectors.,vectors
+3,What is chunking in RAG?,"Chunking splits documents into smaller passages so retrieval returns focused, relevant context to the model.",rag
+4,What is hybrid search?,Hybrid search combines vector similarity with keyword matching and fuses the rankings for better recall.,rag
+5,What is pgvector?,pgvector is a PostgreSQL extension that stores vectors and runs similarity search with indexes like HNSW.,postgres
+6,What is dbt?,"dbt is a transformation tool that lets you build, test, and document SQL models in your data warehouse.",de
+7,What is DuckDB?,"DuckDB is an in-process analytical (OLAP) database, like SQLite for analytics, great for local pipelines.",de
+8,What is retrieval-augmented generation?,RAG retrieves relevant documents and passes them as context to an LLM so answers are grounded in your data.,rag

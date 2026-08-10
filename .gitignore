@@ -13,3 +13,10 @@ __pycache__/
 
 # OS
 .DS_Store
+
+# DuckDB + dbt
+de/dbt/warehouse.duckdb
+de/dbt/target/
+de/dbt/logs/
+de/dbt/.user.yml
+data/warehouse_corpus/

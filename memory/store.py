@@ -22,7 +22,7 @@ def remember(mem, user_id: str, messages) -> None:
 
 def recall(mem, user_id: str, query: str) -> list[str]:
     """Return memory strings relevant to the query for a user."""
-    result = mem.search(query, user_id=user_id)
+    result = mem.search(query, filters={"user_id": user_id})
     # mem0 returns either {"results": [{"memory": ...}, ...]} or a list; handle both.
     rows = result.get("results", result) if isinstance(result, dict) else result
     return [r.get("memory", str(r)) if isinstance(r, dict) else str(r) for r in rows]

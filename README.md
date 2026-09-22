@@ -24,6 +24,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 - **Hybrid search**: pgvector cosine + Postgres full-text (`tsvector`), fused with Reciprocal Rank Fusion (k=60)
 - **LangChain**: an LCEL RAG chain (`langchain-ollama`) over the same hybrid retrieval, with optional LangSmith tracing
 - **Orchestration**: Dagster — the ingestion pipeline as assets (`corpus_source → pgvector_chunks`) with an asset check and a daily schedule; run locally with `dagster dev`
+- **Evaluation**: Ragas — faithfulness / answer-relevancy / context-precision / context-recall over a labeled Q&A set, comparing vector-only vs hybrid (local Ollama judge by default)
 
 ## Quickstart
 
@@ -70,6 +71,10 @@ use_cases/
 langchain_rag/
   retriever.py   # BaseRetriever wrapping hybrid_search -> LangChain Documents
   chain.py       # LCEL RAG chain (retriever -> prompt -> ChatOllama)
+evals/ragas/
+  dataset.json        # hand-labeled Q&A (question + ground truth)
+  judge.py            # local-Ollama (default) / API judge factory for Ragas
+  run_eval.py         # scores vector-only vs hybrid, writes results.json
 data/
   corpus/        # sample corpus ingested by the RAG chatbot
   documents.py   # Sample document corpus
@@ -120,6 +125,26 @@ so scheduled re-runs only re-embed changed files.
 pytest                    # unit tests (no infra needed)
 pytest -m integration     # DB tests — needs `docker compose up -d` (no Ollama needed; tests use a fake embedder)
 ```
+
+## Evaluation (Ragas)
+
+Measure retrieval + generation quality and compare retrieval modes:
+
+```bash
+docker compose up -d
+pip install -e ".[eval]"
+python demo.py ingest data/corpus
+python -m evals.ragas.run_eval            # add --limit 2 for a quick run
+```
+
+It scores faithfulness, answer-relevancy, context-precision, and context-recall
+for **vector-only vs hybrid** retrieval over `evals/ragas/dataset.json`, prints a
+side-by-side table, and writes `results.json`. The judge defaults to local
+`llama3.2` ($0) — set `RAGAS_JUDGE=openai` (or `anthropic`) with the provider's
+API key for more stable scores. Local-judge scores are noisy — read them as
+relative, not authoritative.
+
+**Note on speed:** the local `llama3.2` judge is fine for wiring/plumbing but is impractically slow for a full run (≈2–3 min per metric call). For real numbers, use an API judge: set `RAGAS_JUDGE=anthropic` (or `openai`) with the provider's API key. Locally, use `--limit` for a small smoke run only.
 
 ## Key Concepts
 

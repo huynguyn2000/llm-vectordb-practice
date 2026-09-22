@@ -15,7 +15,7 @@ def corpus(tmp_path):
         "Plain text content for the ingest test.", encoding="utf-8"
     )
     (tmp_path / "zz-test-doc.pdf").write_bytes(build_pdf("Hello from a test PDF."))
-    (tmp_path / "ignored.docx").write_text("should be ignored", encoding="utf-8")
+    (tmp_path / "ignored.rtf").write_text("should be ignored", encoding="utf-8")
     return tmp_path
 
 

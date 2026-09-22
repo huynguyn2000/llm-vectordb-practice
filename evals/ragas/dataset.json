@@ -1,0 +1,14 @@
+[
+  {"question": "What is machine learning?", "ground_truth": "Machine learning is a subset of artificial intelligence where systems learn patterns from data and improve from experience instead of being explicitly programmed."},
+  {"question": "What is the difference between supervised and unsupervised learning?", "ground_truth": "Supervised learning trains on labeled input-output pairs (e.g. classification, regression); unsupervised learning finds structure in unlabeled data, such as clustering or dimensionality reduction."},
+  {"question": "What is deep learning?", "ground_truth": "Deep learning uses neural networks with many layers, each transforming its input into a more abstract representation, so features are learned automatically."},
+  {"question": "How do plants make food?", "ground_truth": "Through photosynthesis: in chloroplasts, plants convert sunlight, water, and carbon dioxide into glucose and oxygen."},
+  {"question": "What happens in the light-dependent reactions of photosynthesis?", "ground_truth": "Chlorophyll absorbs sunlight and uses it to split water, releasing oxygen, and stores energy in ATP and NADPH."},
+  {"question": "What is the Calvin cycle?", "ground_truth": "The light-independent stage of photosynthesis that uses ATP and NADPH to fix carbon dioxide into glucose."},
+  {"question": "What is the speed of light?", "ground_truth": "About 299,792 kilometers per second in a vacuum, denoted c, the universal speed limit for information."},
+  {"question": "How long does sunlight take to reach Earth?", "ground_truth": "A little over eight minutes."},
+  {"question": "How many planets are in the solar system and how are they grouped?", "ground_truth": "Eight planets: four small rocky inner planets and four gas and ice giant outer planets."},
+  {"question": "What are vector databases used for?", "ground_truth": "They index high-dimensional embeddings so nearest-neighbor similarity search stays fast even across millions of items."},
+  {"question": "What is chlorophyll?", "ground_truth": "The green pigment in chloroplasts that absorbs sunlight to drive photosynthesis."},
+  {"question": "Why can nothing travel faster than light?", "ground_truth": "The speed of light in a vacuum is the universal speed limit; nothing carrying information can exceed it."}
+]

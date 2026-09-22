@@ -14,6 +14,12 @@ __pycache__/
 # OS
 .DS_Store
 
+# DuckDB + dbt
+de/dbt/warehouse.duckdb
+de/dbt/target/
+de/dbt/logs/
+de/dbt/.user.yml
+data/warehouse_corpus/
 # local demo artifact stores (mem0/chroma/langgraph dev)
 .mem0_chroma/
 .chroma/

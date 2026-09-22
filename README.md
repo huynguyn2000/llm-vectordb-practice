@@ -6,6 +6,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 
 | Command | What it demonstrates |
 |---|---|
+| `python demo.py warehouse` | Build a DuckDB warehouse with dbt and export its `documents` mart to a RAG corpus |
 | `python demo.py ingest [dir]` | Ingest a folder of .md/.txt/.pdf into chunked, embedded storage (default `data/corpus`) |
 | `python demo.py compare "<query>"` | Compare vector-only vs hybrid (RRF) retrieval rankings side by side |
 | `python demo.py vsdb "<query>"` | Compare pgvector vs ChromaDB vector search side by side |
@@ -29,6 +30,7 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 - **Document parsing**: Docling (layout/table-aware → Markdown) for `.pdf`/`.docx` via the `docling` extra; falls back to `pypdf` for PDFs when the extra isn't installed
 - **Hybrid search**: pgvector cosine + Postgres full-text (`tsvector`), fused with Reciprocal Rank Fusion (k=60)
 - **LangChain**: an LCEL RAG chain (`langchain-ollama`) over the same hybrid retrieval, with optional LangSmith tracing
+- **Structured source (DE)**: a DuckDB warehouse transformed by dbt (seed → staging → `documents` mart), exported to a corpus the RAG pipeline ingests — RAG on top of real data-engineering work
 - **Agent patterns**: LangGraph graphs — query routing and reflection (generate→critique→revise) — alongside the hybrid retrieval; ReAct (tool-calling) and supervisor/multi-agent are documented next patterns
 - **Orchestration**: Dagster — the ingestion pipeline as assets (`corpus_source → pgvector_chunks`) with an asset check and a daily schedule; run locally with `dagster dev`
 - **Memory**: Mem0 memory layer (local Ollama + Chroma) — `remember`/`recall` user facts across turns (opt-in `memory` extra)
@@ -88,6 +90,9 @@ agent_patterns/
 langchain_rag/
   retriever.py   # BaseRetriever wrapping hybrid_search -> LangChain Documents
   chain.py       # LCEL RAG chain (retriever -> prompt -> ChatOllama)
+de/
+  dbt/           # dbt project: seed (faq.csv) → staging → documents mart (SQL models)
+  pipeline.py    # run_dbt, export_documents, write_corpus (warehouse → corpus export)
 memory/
   config.py      # build_memory_config — pure, local Ollama + Chroma config (no mem0 import)
   store.py       # build_memory/remember/recall — thin Mem0 wrapper, mem0 imported lazily
@@ -125,6 +130,23 @@ LANGCHAIN_PROJECT=llm-vectordb-practice
 The chain is tagged (`run_name="langchain_rag"`, tags `rag`/`hybrid`) so traces
 are legible in the LangSmith UI.
 
+## Structured source (DuckDB + dbt)
+
+Rather than ingesting just unstructured documents, the RAG pipeline can consume a
+DuckDB warehouse transformed by dbt:
+
+```bash
+pip install -e ".[de]"
+python demo.py warehouse     # Runs dbt (seed → staging → documents mart) + exports to data/warehouse_corpus/
+python demo.py ingest data/warehouse_corpus
+```
+
+The dbt project in `de/dbt/` transforms seed data (CSV) through staging models into a
+`documents` mart with `id`, `source`, and `content` fields, exported as markdown files. This
+demonstrates RAG over structured data pipelines. For production orchestration, the
+natural integration is **dagster-dbt** (decorates dbt nodes as Dagster assets), which
+is not wired in this demo but shows the path to production data-engineering + RAG
+workflows.
 ## Better parsing with Docling
 
 By default, PDFs are parsed with `pypdf` (light, text-only). For layout- and

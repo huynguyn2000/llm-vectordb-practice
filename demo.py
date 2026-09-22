@@ -7,6 +7,7 @@ Usage:
   python demo.py rag                # RAG chatbot only
   python demo.py products           # product similarity only
   python demo.py logs               # log anomaly clustering only
+  python demo.py warehouse          # build DuckDB/dbt warehouse + export documents
   python demo.py ingest [dir]       # ingest a folder of .md/.txt/.pdf (default: data/corpus)
   python demo.py memory "<user_id>" # store + recall user memories via Mem0
 """
@@ -104,6 +105,9 @@ def main():
         print(f"\nQuestion: {query}\nAnswer:   {answer}")
         return
 
+    if selected == "warehouse":
+        try:
+            from de.pipeline import export_documents, run_dbt, write_corpus
     if selected == "memory":
         user_id = sys.argv[2] if len(sys.argv) > 2 else "demo-user"
         try:
@@ -112,6 +116,14 @@ def main():
             print(exc)
             return
         try:
+            run_dbt()
+            rows = export_documents()
+        except (ImportError, RuntimeError) as exc:
+            print(exc)
+            return
+        n = write_corpus(rows)
+        print(f"Built {n} documents from the DuckDB/dbt warehouse -> data/warehouse_corpus/")
+        print("Next: python demo.py ingest data/warehouse_corpus")
             mem = build_memory()
         except ImportError as exc:
             print(exc)

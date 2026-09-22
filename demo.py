@@ -8,6 +8,7 @@ Usage:
   python demo.py products           # product similarity only
   python demo.py logs               # log anomaly clustering only
   python demo.py ingest [dir]       # ingest a folder of .md/.txt/.pdf (default: data/corpus)
+  python demo.py memory "<user_id>" # store + recall user memories via Mem0
 """
 
 import sys
@@ -103,6 +104,24 @@ def main():
         print(f"\nQuestion: {query}\nAnswer:   {answer}")
         return
 
+    if selected == "memory":
+        user_id = sys.argv[2] if len(sys.argv) > 2 else "demo-user"
+        try:
+            from memory.store import build_memory, recall, remember
+        except ImportError as exc:
+            print(exc)
+            return
+        try:
+            mem = build_memory()
+        except ImportError as exc:
+            print(exc)
+            return
+        remember(mem, user_id, "I prefer concise answers.")
+        remember(mem, user_id, "I work with pgvector and Postgres.")
+        memories = recall(mem, user_id, "what do you know about me?")
+        print(f"Memories for {user_id}:")
+        for m in memories:
+            print(f"  - {m}")
     if selected in ("router", "reflect"):
         if len(sys.argv) < 3:
             print(f'Usage: python demo.py {selected} "<text>"')

@@ -17,16 +17,19 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["ruff", "pytest"]
-langchain = ["langchain>=0.3,<0.4", "langchain-ollama>=0.2", "langsmith>=0.1"]
+langchain = ["langchain>=0.3,<0.4", "langchain-ollama>=0.2", "langsmith>=0.1", "langgraph>=0.2,<0.6"]
+docling = ["docling>=2.0"]
 orchestration = ["dagster>=1.8,<2", "dagster-webserver>=1.8,<2"]
 memory = ["mem0ai>=2,<3"]
+chroma = ["chromadb>=0.5"]
+eval = ["ragas>=0.2,<0.3", "datasets>=2.0", "langchain-ollama>=0.2"]
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-packages = ["core", "use_cases", "data", "ingestion", "search", "langchain_rag","orchestration", "memory", "memory.tests"]
+packages = ["core", "use_cases", "data", "ingestion", "search", "langchain_rag","orchestration", "memory", "memory.tests""agent_patterns", "agent_patterns.tests", "vectorstores", "vectorstores.tests", "evals", "evals.ragas", "evals.ragas.tests"]
 
 [tool.ruff]
 line-length = 100

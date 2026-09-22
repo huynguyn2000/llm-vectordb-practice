@@ -23,9 +23,11 @@ Vector DB use cases with **pgvector + Ollama**, fully local.
 - **LLM**: Ollama `llama3.2` (local, used in RAG chatbot)
 - **Ingestion**: recursive token-aware chunking (tiktoken `cl100k_base`, 600-token chunks, 80-token overlap), idempotent re-ingest via SHA-256 content hashes
 - **Vector-store abstraction**: a `VectorBackend` protocol with pgvector and ChromaDB (embedded) backends; `demo.py vsdb` compares them (Weaviate is a documented next adapter)
+- **Document parsing**: Docling (layout/table-aware → Markdown) for `.pdf`/`.docx` via the `docling` extra; falls back to `pypdf` for PDFs when the extra isn't installed
 - **Hybrid search**: pgvector cosine + Postgres full-text (`tsvector`), fused with Reciprocal Rank Fusion (k=60)
 - **LangChain**: an LCEL RAG chain (`langchain-ollama`) over the same hybrid retrieval, with optional LangSmith tracing
 - **Orchestration**: Dagster — the ingestion pipeline as assets (`corpus_source → pgvector_chunks`) with an asset check and a daily schedule; run locally with `dagster dev`
+- **Evaluation**: Ragas — faithfulness / answer-relevancy / context-precision / context-recall over a labeled Q&A set, comparing vector-only vs hybrid (local Ollama judge by default)
 
 ## Quickstart
 
@@ -54,7 +56,7 @@ core/
   embedder.py    # Ollama embedding client
   models.py      # Pydantic models
 ingestion/
-  loaders.py     # file -> text (.md/.txt/.pdf)
+  loaders.py     # file -> text (.md/.txt plain; .pdf/.docx via Docling, pypdf fallback)
   chunker.py     # text -> token-sized chunks with overlap
   ingest.py      # hash-diff orchestration: load -> chunk -> embed -> upsert
 search/
@@ -77,6 +79,10 @@ use_cases/
 langchain_rag/
   retriever.py   # BaseRetriever wrapping hybrid_search -> LangChain Documents
   chain.py       # LCEL RAG chain (retriever -> prompt -> ChatOllama)
+evals/ragas/
+  dataset.json        # hand-labeled Q&A (question + ground truth)
+  judge.py            # local-Ollama (default) / API judge factory for Ragas
+  run_eval.py         # scores vector-only vs hybrid, writes results.json
 data/
   corpus/        # sample corpus ingested by the RAG chatbot
   documents.py   # Sample document corpus
@@ -106,6 +112,27 @@ LANGCHAIN_PROJECT=llm-vectordb-practice
 
 The chain is tagged (`run_name="langchain_rag"`, tags `rag`/`hybrid`) so traces
 are legible in the LangSmith UI.
+
+## Better parsing with Docling
+
+By default, PDFs are parsed with `pypdf` (light, text-only). For layout- and
+table-aware parsing (PDF/DOCX → Markdown), install the Docling extra:
+
+```bash
+pip install -e ".[docling]"     # pulls torch; first convert downloads ~GB of models
+python demo.py ingest data/corpus
+```
+
+With the extra installed, `.pdf` and `.docx` are converted via Docling; without
+it, `.pdf` still works via the pypdf fallback and `.docx` raises a clear error.
+
+> **Heads-up — install Docling in a separate venv.** Docling pins
+> `antlr4-python3-runtime` 4.9.x, which is incompatible with Dagster's generated
+> asset-selection lexer (fails with `TypeError: ord() ...`). So the `docling`
+> and `orchestration` extras can't share one environment. Use a dedicated venv
+> for Docling-based ingestion; keep the default/dev venv (with Dagster, tests)
+> Docling-free — the pypdf fallback keeps PDFs working there.
+
 ## Orchestration (Dagster)
 
 The file-ingestion pipeline is orchestrated by Dagster as assets. Run it locally:
@@ -143,6 +170,26 @@ The `demo.py vsdb` command embeds the query once and retrieves top-5 results fro
 pytest                    # unit tests (no infra needed)
 pytest -m integration     # DB tests — needs `docker compose up -d` (no Ollama needed; tests use a fake embedder)
 ```
+
+## Evaluation (Ragas)
+
+Measure retrieval + generation quality and compare retrieval modes:
+
+```bash
+docker compose up -d
+pip install -e ".[eval]"
+python demo.py ingest data/corpus
+python -m evals.ragas.run_eval            # add --limit 2 for a quick run
+```
+
+It scores faithfulness, answer-relevancy, context-precision, and context-recall
+for **vector-only vs hybrid** retrieval over `evals/ragas/dataset.json`, prints a
+side-by-side table, and writes `results.json`. The judge defaults to local
+`llama3.2` ($0) — set `RAGAS_JUDGE=openai` (or `anthropic`) with the provider's
+API key for more stable scores. Local-judge scores are noisy — read them as
+relative, not authoritative.
+
+**Note on speed:** the local `llama3.2` judge is fine for wiring/plumbing but is impractically slow for a full run (≈2–3 min per metric call). For real numbers, use an API judge: set `RAGAS_JUDGE=anthropic` (or `openai`) with the provider's API key. Locally, use `--limit` for a small smoke run only.
 
 ## Key Concepts
 

@@ -20,3 +20,7 @@ de/dbt/target/
 de/dbt/logs/
 de/dbt/.user.yml
 data/warehouse_corpus/
+# local demo artifact stores (mem0/chroma/langgraph dev)
+.mem0_chroma/
+.chroma/
+.langgraph_api/
